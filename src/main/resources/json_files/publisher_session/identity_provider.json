@@ -1,0 +1,5 @@
+{
+  "name": "Test Identity Provider",
+  "entityId": "test_identity_provider",
+  "federationId": "test_federation_id"
+}

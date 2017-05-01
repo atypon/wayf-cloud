@@ -188,4 +188,60 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
         assertJsonEquals(requestJsonString, readByIdResponse, SERVER_GENERATED_FIELDS);
     }
 
+    @Test
+    public void testReadByIdWithFields() throws Exception {
+        String publisherRequest = getFileAsString("json_files/publisher_session/publisher.json");
+        String publisherResponse =
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(publisherRequest)
+                        .post("/1/publisher")
+                .then()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+        String publisherId = readField(publisherResponse, "id");
+        assertNotNull(publisherId);
+
+        String requestJsonString = getFileAsString("json_files/publisher_session/create_with_fields.json");
+
+        String requestWithPublisher = setField(requestJsonString, "publisher.id", publisherId);
+
+        String createResponse =
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(requestWithPublisher)
+                        .post("/1/publisherSession")
+                        .then()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+
+        String id = readField(createResponse, "id");
+
+        assertNotNull(id);
+
+        String readByIdWithFieldsResponse =
+                given()
+                        .urlEncodingEnabled(false)
+                        .queryParam("fields", "publisher")
+                        .get("/1/publisherSession/" + id)
+                .then()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+        // Ensure the server gave us the ID we requested
+        assertEquals(id, readField(readByIdWithFieldsResponse, "id"));
+
+        // Get the publisher from the response and verify that it matches the one that was created
+        String publisherOnSession = readField(readByIdWithFieldsResponse, "publisher");
+        assertJsonEquals(publisherResponse, publisherOnSession, null);
+
+        // Ensure server generated fields come back
+        assertNotNullPaths(readByIdWithFieldsResponse, SERVER_GENERATED_FIELDS);
+
+        // Compare the JSON to the payload on record
+        assertJsonEquals(requestJsonString, readByIdWithFieldsResponse, ArrayUtils.addAll(SERVER_GENERATED_FIELDS, "publisher"));
+    }
+
 }

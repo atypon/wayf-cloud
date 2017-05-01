@@ -37,6 +37,7 @@ import org.junit.BeforeClass;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -86,7 +87,17 @@ public abstract class BaseHttpTest {
     }
 
     protected String readField(String json, String field) {
-        return JsonPath.read(json, JSON_PATH_PREFIX + field, ALWAYS_TRUE_PREDICATE);
+        Object value = JsonPath.read(json, JSON_PATH_PREFIX + field, ALWAYS_TRUE_PREDICATE);
+
+        if (value == null) {
+            return null;
+        }
+
+        if (Map.class.isAssignableFrom(value.getClass())) {
+            return JsonPath.parse(value).jsonString();
+        } else {
+            return String.valueOf(value);
+        }
     }
 
     protected String setField(String json, String field, String value) {
@@ -109,8 +120,10 @@ public abstract class BaseHttpTest {
         DocumentContext expectedDocument = JsonPath.parse(expected);
         DocumentContext actualDocument = JsonPath.parse(actual);
 
-        removeFields(expectedDocument, blacklistedFields);
-        removeFields(actualDocument, blacklistedFields);
+        if (blacklistedFields != null) {
+            removeFields(expectedDocument, blacklistedFields);
+            removeFields(actualDocument, blacklistedFields);
+        }
 
         try {
             ObjectMapper mapper = new ObjectMapper();
