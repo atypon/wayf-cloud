@@ -20,7 +20,7 @@ import com.atypon.wayf.dao.PublisherSessionDao;
 import com.atypon.wayf.dao.QueryMapper;
 import com.atypon.wayf.dao.neo4j.Neo4JExecutor;
 import com.atypon.wayf.data.publisher.PublisherSession;
-import com.atypon.wayf.data.publisher.PublisherSessionFilter;
+import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import com.atypon.wayf.reactivex.DaoPolicies;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -28,13 +28,10 @@ import com.google.inject.name.Named;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class PublisherSessionDaoNeo4JImpl implements PublisherSessionDao {
@@ -61,7 +58,8 @@ public class PublisherSessionDaoNeo4JImpl implements PublisherSessionDao {
     private String addIdpRelationshipCypher;
 
     @Inject
-    @Named("publisher-session.dao.neo4j.filter")
+    //@Named("publisher-session.dao.neo4j.filter")
+    @Named("publisher-session.dao.neo4j.filter-by-device")
     private String filterCypher;
 
     @Inject
@@ -84,13 +82,10 @@ public class PublisherSessionDaoNeo4JImpl implements PublisherSessionDao {
     }
 
     @Override
-    public Single<PublisherSession> read(String id) {
-        PublisherSession publisherSession = new PublisherSession();
-        publisherSession.setId(id);
-
-        return Single.just(publisherSession)
+    public Single<PublisherSession> read(PublisherSessionQuery query) {
+        return Single.just(query)
                 .compose((single) -> DaoPolicies.applySingle(single))
-                .map((_publisherSession) -> QueryMapper.buildQueryArguments(readCypher, _publisherSession))
+                .map((_query) -> QueryMapper.buildQueryArguments(readCypher, _query))
                 .map((arguments) -> dbExecutor.executeQuerySelectFirst(readCypher, arguments, PublisherSession.class));
     }
 
@@ -117,7 +112,7 @@ public class PublisherSessionDaoNeo4JImpl implements PublisherSessionDao {
     }
 
     @Override
-    public Observable<PublisherSession> filter(PublisherSessionFilter filterCriteria) {
+    public Observable<PublisherSession> filter(PublisherSessionQuery filterCriteria) {
         LOG.debug("Filtering in Neo4J for criteria [{}]", filterCriteria);
 
         return Observable.just(filterCriteria)

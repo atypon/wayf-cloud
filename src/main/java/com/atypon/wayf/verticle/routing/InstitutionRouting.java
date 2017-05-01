@@ -69,7 +69,7 @@ public class InstitutionRouting implements RoutingProvider {
         LOG.debug("Received read institution request");
 
         return Single.just(routingContext)
-                .flatMap((rc) -> RequestReader.readPathArgument(rc, INSTITUTION_ID_PARAM_NAME))
+                .map((rc) -> RequestReader.readPathArgument(rc, INSTITUTION_ID_PARAM_NAME))
                 .flatMap((institutionId) -> institutionFacade.read(institutionId));
     }
 
@@ -85,7 +85,7 @@ public class InstitutionRouting implements RoutingProvider {
         LOG.debug("Received delete institution request");
 
         return Single.just(routingContext)
-                .flatMap((rc) -> RequestReader.readPathArgument(rc, INSTITUTION_ID_PARAM_NAME))
+                .map((rc) -> RequestReader.readPathArgument(rc, INSTITUTION_ID_PARAM_NAME))
                 .flatMapCompletable((institutionId) -> institutionFacade.delete(institutionId));
     }
 }

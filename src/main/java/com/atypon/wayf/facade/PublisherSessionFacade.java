@@ -17,17 +17,17 @@
 package com.atypon.wayf.facade;
 
 import com.atypon.wayf.data.publisher.PublisherSession;
-import com.atypon.wayf.data.publisher.PublisherSessionFilter;
+import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PublisherSessionFacade {
     Single<PublisherSession> create(PublisherSession publisherSession);
-    Single<PublisherSession> read(String id);
+    Single<PublisherSession> read(PublisherSessionQuery query);
     Single<PublisherSession> update(PublisherSession publisherSession);
     Completable delete(String id);
-    Observable<PublisherSession> filter(PublisherSessionFilter filterCriteria);
+    Observable<PublisherSession> filter(PublisherSessionQuery filterCriteria);
 
     Completable addIdpRelationship(PublisherSession publisherSession);
 }

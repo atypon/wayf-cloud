@@ -64,7 +64,11 @@ public class ResultSetProcessor {
         if (index == path.length - 1) {
             LOG.debug("Setting bean[{}] field[{}] to value[{}]", bean, fieldName, value);
 
-            beanUtilsBean.setProperty(bean, fieldName, value);
+            if (value != null) {
+                beanUtilsBean.setProperty(bean, fieldName, value);
+            } else {
+                return null;
+            }
         } else {
             Object childBean = beanUtilsBean.getPropertyUtils().getProperty(bean, fieldName);
 
@@ -74,8 +78,7 @@ public class ResultSetProcessor {
 
             LOG.debug("Recursing for childBean bean[{}] field[{}]", childBean, fieldName);
 
-            handleNestedValue(childBean, path, ++index, value);
-            beanUtilsBean.setProperty(bean, fieldName, childBean);
+            beanUtilsBean.setProperty(bean, fieldName, handleNestedValue(childBean, path, ++index, value));
         }
 
         return bean;

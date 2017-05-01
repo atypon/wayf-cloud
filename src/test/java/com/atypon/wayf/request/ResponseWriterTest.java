@@ -43,6 +43,6 @@ public class ResponseWriterTest {
     public void testHasNoMore() {
         RequestContextAccessor.set(new RequestContext().setRequestUrl("/list").setOffset(0).setLimit(30).setHasAnotherDbPage(Boolean.FALSE));
         String link = new ResponseWriterMock()._getLinkHeaderValue();
-        Assert.assertNull(link);
+        Assert.assertEquals("", link);
     }
 }

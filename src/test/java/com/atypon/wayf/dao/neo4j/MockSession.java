@@ -16,8 +16,6 @@
 
 package com.atypon.wayf.dao.neo4j;
 
-import com.atypon.wayf.request.RequestContextAccessor;
-import com.google.common.collect.Lists;
 import org.neo4j.driver.v1.*;
 import org.neo4j.driver.v1.exceptions.NoSuchRecordException;
 import org.neo4j.driver.v1.summary.ResultSummary;

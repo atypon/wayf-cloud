@@ -39,10 +39,10 @@ public class RequestReader {
         return Single.just(routingContext).observeOn(Schedulers.computation()).map((rc) -> _readRequestBody(rc, bodyClass));
     }
 
-    public static Single<String> readPathArgument(RoutingContext routingContext, String argumentName) {
+    public static String readPathArgument(RoutingContext routingContext, String argumentName) {
         LOG.debug("Reading param [{}] from request", argumentName);
 
-        return Single.just(routingContext).observeOn(Schedulers.computation()).map((rc) -> rc.request().getParam(argumentName));
+        return routingContext.request().getParam(argumentName);
     }
 
     public static String getQueryValue(RoutingContext routingContext, String queryKey) {
@@ -50,4 +50,8 @@ public class RequestReader {
         return routingContext.request().getParam(queryKey);
     }
 
+    public static String getHeaderValue(RoutingContext routingContext, String headerName) {
+        LOG.debug("Reading header value [{}] from request", headerName);
+        return routingContext.request().getHeader(headerName);
+    }
 }

@@ -17,7 +17,7 @@
 package com.atypon.wayf.request;
 
 import com.atypon.wayf.data.ErrorResponse;
-import com.sun.javafx.fxml.builder.URLBuilder;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import io.vertx.core.json.Json;
@@ -39,6 +39,8 @@ public class ResponseWriter {
 
     public static <B> void buildSuccess(RoutingContext routingContext, B body) {
         LOG.debug("Building success message");
+
+        Json.prettyMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         Completable.fromAction(
                 () ->
@@ -117,6 +119,8 @@ public class ResponseWriter {
                     .toString();
         }
 
-        return null;
+        return "";
     }
+
+
 }

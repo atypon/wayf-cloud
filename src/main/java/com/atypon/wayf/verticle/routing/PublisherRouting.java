@@ -70,7 +70,7 @@ public class PublisherRouting implements RoutingProvider {
         LOG.debug("Received read PublisherSession request");
 
         return Single.just(routingContext)
-                .flatMap((rc) -> RequestReader.readPathArgument(rc, PUBLISHER_ID_PARAM_NAME))
+                .map((rc) -> RequestReader.readPathArgument(rc, PUBLISHER_ID_PARAM_NAME))
                 .flatMap((publisherId) -> publisherFacade.read(publisherId));
     }
 

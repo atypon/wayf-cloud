@@ -29,6 +29,7 @@ public class RequestContext {
     private Integer limit = DEFAULT_LIMIT;
     private Integer offset = DEFAULT_OFFSET;
 
+    private String deviceId;
     private String requestUrl;
     private String requestUri;
     private boolean forceSync;
@@ -48,13 +49,24 @@ public class RequestContext {
         requestContext.setForceSync(Boolean.parseBoolean(forceSyncQueryValue));
 
         String limit = RequestReader.getQueryValue(routingContext, "limit");
-        if (limit != null) {
+        if (limit != null && !limit.isEmpty()) {
+            LOG.debug("Found limit query param [{}]", limit);
+
             requestContext.setLimit(Integer.parseInt(limit));
         }
 
         String offset = RequestReader.getQueryValue(routingContext, "offset");
-        if (offset != null) {
+        if (offset != null && !offset.isEmpty()) {
+            LOG.debug("Found offset query param [{}]", offset);
+
             requestContext.setOffset(Integer.parseInt(offset));
+        }
+
+        String deviceId = RequestReader.getHeaderValue(routingContext, "deviceId");
+        if (deviceId != null && !deviceId.isEmpty()) {
+            LOG.debug("Found deviceId header [{}]", deviceId);
+
+            requestContext.setDeviceId(deviceId);
         }
 
         return requestContext;
@@ -111,6 +123,15 @@ public class RequestContext {
 
     public RequestContext setHasAnotherDbPage(Boolean hasAnotherDbPage) {
         this.hasAnotherDbPage = hasAnotherDbPage;
+        return this;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public RequestContext setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
         return this;
     }
 }

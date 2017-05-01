@@ -21,7 +21,7 @@ import com.atypon.wayf.data.cache.CascadingCache;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.device.DeviceStatus;
 import com.atypon.wayf.data.publisher.PublisherSession;
-import com.atypon.wayf.data.publisher.PublisherSessionFilter;
+import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import com.atypon.wayf.facade.DeviceFacade;
 import com.atypon.wayf.facade.IdentityProviderFacade;
 import com.atypon.wayf.facade.PublisherSessionFacade;
@@ -87,10 +87,10 @@ public class PublisherSessionFacadeImpl implements PublisherSessionFacade {
     }
 
     @Override
-    public Single<PublisherSession> read(String id) {
-        return Single.just(id)
+    public Single<PublisherSession> read(PublisherSessionQuery query) {
+        return Single.just(query)
                 .observeOn(Schedulers.io())
-                .flatMap((_id) -> publisherSessionDao.read(_id));
+                .flatMap((_query) -> publisherSessionDao.read(_query));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class PublisherSessionFacadeImpl implements PublisherSessionFacade {
     }
 
     @Override
-    public Observable<PublisherSession> filter(PublisherSessionFilter filterCriteria) {
+    public Observable<PublisherSession> filter(PublisherSessionQuery filterCriteria) {
         LOG.debug("Filtering for publisher sessions with criteria [{}]", filterCriteria);
 
         return Observable.just(filterCriteria)

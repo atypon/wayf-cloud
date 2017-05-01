@@ -20,14 +20,12 @@ import com.atypon.wayf.dao.DeviceDao;
 import com.atypon.wayf.dao.PublisherDao;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.device.DeviceStatus;
-import com.atypon.wayf.data.publisher.Publisher;
-import com.atypon.wayf.data.publisher.PublisherSession;
-import com.atypon.wayf.data.publisher.PublisherSessionStatus;
-import com.atypon.wayf.data.publisher.PublisherStatus;
+import com.atypon.wayf.data.publisher.*;
 import com.atypon.wayf.guice.WayfGuiceModule;
 import com.atypon.wayf.reactivex.WayfReactivexConfig;
 import com.atypon.wayf.request.RequestContext;
 import com.atypon.wayf.request.RequestContextAccessor;
+import com.google.common.collect.Sets;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import org.junit.Assert;
@@ -36,7 +34,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.List;
 
+@Ignore
 public class PublisherSessionDaoNeo4JImplTest {
 
     @Inject
@@ -84,5 +84,15 @@ public class PublisherSessionDaoNeo4JImplTest {
         Assert.assertNotNull(createdPublisherSession.getId());
         Assert.assertNotNull(createdPublisherSession.getCreatedDate());
         Assert.assertNotNull(createdPublisherSession.getModifiedDate());
+    }
+
+    @Test
+    public void testFilter() {
+        PublisherSessionQuery filter = new PublisherSessionQuery()
+                .setDeviceId("3ece9fea-dbda-4775-84fb-9109dc37ba59")
+                .setFields(Sets.newHashSet(PublisherSessionQuery.IDENTITY_PROVIDER_FIELD, PublisherSessionQuery.PUBLISHER_FIELD));
+
+        List<PublisherSession> sessions =  dao.filter(filter).toList().blockingGet();
+        Assert.assertEquals(4, sessions.size());
     }
 }

@@ -67,7 +67,7 @@ public class DeviceRoutingProvider implements RoutingProvider {
         LOG.debug("Received read Device request");
 
         return Single.just(routingContext)
-                .flatMap((rc) -> RequestReader.readPathArgument(rc, DEVICE_ID_PARAM_NAME))
+                .map((rc) -> RequestReader.readPathArgument(rc, DEVICE_ID_PARAM_NAME))
                 .flatMap((deviceId) -> deviceFacade.read(deviceId));
     }
 }

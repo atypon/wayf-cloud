@@ -1,0 +1,27 @@
+{
+  "id": "2da63895-e12f-44fe-af5a-6097c69b4865",
+  "localId": null,
+  "status": "ACTIVE",
+  "device": null,
+  "identityProvider": {
+    "id": null,
+    "name": null,
+    "entityId": null,
+    "federationId": null,
+    "createdDate": null,
+    "modifiedDate": null
+  },
+  "publisher": {
+    "id": "0c6b3091-d108-465d-a295-cca7918e82cd",
+    "status": "ACTIVE",
+    "name": "Test Publisher",
+    "platform": null,
+    "identityProviders": null,
+    "admins": null,
+    "createdDate": "2017-04-07 17:38:25.925",
+    "modifiedDate": "2017-04-07 17:38:25.925"
+  },
+  "lastActiveDate": "2017-04-17 16:59:20.655",
+  "createdDate": "2017-04-17 16:59:20.980",
+  "modifiedDate": "2017-04-17 16:59:20.980"
+}
