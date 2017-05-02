@@ -43,7 +43,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public abstract class BaseHttpTest {
-    protected static final String JSON_PATH_PREFIX = "$.";
+    protected static final String JSON_PATH_PREFIX = "";
 
     private static Vertx vertx;
     private static Integer port;
@@ -135,6 +135,7 @@ public abstract class BaseHttpTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
+
+
 }

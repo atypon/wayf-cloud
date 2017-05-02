@@ -55,7 +55,7 @@ public class PublisherSessionRouting implements RoutingProvider {
     private static final String READ_PUBLISHER_SESSION = PUBLISHER_SESSION_BASE_URL + "/" +  PUBLISHER_SESSION_ID_PARAM;
     private static final String READ_PUBLISHER_SESSION_BY_LOCAL_ID = PUBLISHER_SESSION_BASE_URL + "/" + PUBLISHER_SESSION_LOCAL_ID_PARAM_NAME + "=" +  PUBLISHER_SESSION_LOCAL_ID_PARAM;
     private static final String UPDATE_PUBLISHER_SESSION_BY_PUBLISHER_ID = PUBLISHER_SESSION_BASE_URL + "/" + PUBLISHER_SESSION_PUBLISHER_ID_PARAM;
-    private static final String SET_IDP_BY_PUBLISHER_ID = UPDATE_PUBLISHER_SESSION_BY_PUBLISHER_ID + "/idp";
+    private static final String SET_IDP_BY_PUBLISHER_ID = READ_PUBLISHER_SESSION_BY_LOCAL_ID + "/identityProvider";
     private static final String UPDATE_PUBLISHER_SESSION = PUBLISHER_SESSION_BASE_URL + "/" +  PUBLISHER_SESSION_ID_PARAM;
     private static final String DELETE_PUBLISHER_SESSION = PUBLISHER_SESSION_BASE_URL + "/" +  PUBLISHER_SESSION_ID_PARAM;
     private static final String FILTER_PUBLISHER_SESSION = PUBLISHER_SESSION_BASE_URL + "s";
@@ -130,7 +130,7 @@ public class PublisherSessionRouting implements RoutingProvider {
 
         return Single.just(routingContext)
                 .map((_routingContext) -> {
-                    String localId = RequestReader.readPathArgument(routingContext, SESSION_ID_PARAM_NAME);
+                    String localId = RequestReader.readPathArgument(routingContext, PUBLISHER_SESSION_LOCAL_ID_PARAM_NAME);
                     IdentityProvider identityProvider = RequestReader.readRequestBody(routingContext, IdentityProvider.class).blockingGet();
 
                     LOG.debug("Publisher local ID[{}] Identity Provider[{}]", localId, identityProvider);

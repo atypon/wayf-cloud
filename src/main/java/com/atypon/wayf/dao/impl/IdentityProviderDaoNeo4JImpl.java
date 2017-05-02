@@ -22,17 +22,14 @@ import com.atypon.wayf.dao.neo4j.Neo4JExecutor;
 import com.atypon.wayf.data.IdentityProvider;
 import com.atypon.wayf.data.cache.KeyValueCache;
 import com.atypon.wayf.reactivex.DaoPolicies;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Singleton
@@ -79,7 +76,7 @@ public class IdentityProviderDaoNeo4JImpl implements IdentityProviderDao, KeyVal
     public Maybe<String> get(String key) {
         return Maybe.just(key)
                 .compose((maybe) -> DaoPolicies.applyMaybe(maybe))
-                .map((_key) -> ImmutableMap.<String, Object>builder().put("entityId", key).build())
+                .map((_key) -> {Map<String, Object> args = new HashMap<>(); args.put("entityId", key); return args;})
                 .flatMap((arguments) -> {
                     IdentityProvider result = dbExecutor.executeQuerySelectFirst(getByEntityIdCypher, arguments, IdentityProvider.class);
 

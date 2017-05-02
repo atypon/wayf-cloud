@@ -1,0 +1,10 @@
+[
+  {
+    "localId": "test_local_id_1",
+    "status": "ACTIVE"
+  },
+  {
+    "localId": "test_local_id_2",
+    "status": "ACTIVE"
+  }
+]
