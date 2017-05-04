@@ -23,6 +23,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import io.restassured.RestAssured;
@@ -43,8 +44,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public abstract class BaseHttpTest {
-    protected static final String JSON_PATH_PREFIX = "";
-
     private static Vertx vertx;
     private static Integer port;
 
@@ -72,11 +71,6 @@ public abstract class BaseHttpTest {
 
     protected Predicate ALWAYS_TRUE_PREDICATE = (arg) -> true;
 
-    protected void assertAndRemove(String path, Object document) {
-        assertThat(document, JsonPathMatchers.hasJsonPath(path, IsNull.notNullValue()));
-
-        JsonPath.parse(document).delete(path, ALWAYS_TRUE_PREDICATE);
-    }
 
     protected String getFileAsString(String path) {
         try {
@@ -87,7 +81,7 @@ public abstract class BaseHttpTest {
     }
 
     protected String readField(String json, String field) {
-        Object value = JsonPath.read(json, JSON_PATH_PREFIX + field, ALWAYS_TRUE_PREDICATE);
+        Object value = JsonPath.read(json, field, ALWAYS_TRUE_PREDICATE);
 
         if (value == null) {
             return null;
@@ -101,18 +95,22 @@ public abstract class BaseHttpTest {
     }
 
     protected String setField(String json, String field, String value) {
-        return JsonPath.parse(json).set(JSON_PATH_PREFIX + field, value, ALWAYS_TRUE_PREDICATE).jsonString();
+        return JsonPath.parse(json).set(field, value, ALWAYS_TRUE_PREDICATE).jsonString();
     }
 
     protected void assertNotNullPaths(String json, String... fields) {
         for (String field : fields) {
-            assertThat(json, JsonPathMatchers.hasJsonPath(JSON_PATH_PREFIX + field, IsNull.notNullValue()));
+            assertThat(json, JsonPathMatchers.hasJsonPath(field, IsNull.notNullValue()));
         }
     }
 
     protected void removeFields(DocumentContext document, String... fields) {
         for (String field : fields) {
-            document.delete(JSON_PATH_PREFIX + field, ALWAYS_TRUE_PREDICATE);
+            try {
+                document.delete(field, ALWAYS_TRUE_PREDICATE);
+            } catch (PathNotFoundException e) {
+                // ignore
+            }
         }
     }
 

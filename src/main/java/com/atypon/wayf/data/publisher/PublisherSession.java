@@ -30,7 +30,7 @@ public class PublisherSession {
 
     private Device device;
 
-    private IdentityProvider identityProvider;
+    private IdentityProvider authenticatedBy;
 
     private Publisher publisher;
 
@@ -74,12 +74,12 @@ public class PublisherSession {
         this.device = device;
     }
 
-    public IdentityProvider getIdentityProvider() {
-        return identityProvider;
+    public IdentityProvider getAuthenticatedBy() {
+        return authenticatedBy;
     }
 
-    public void setIdentityProvider(IdentityProvider identityProvider) {
-        this.identityProvider = identityProvider;
+    public void setAuthenticatedBy(IdentityProvider authenticatedBy) {
+        this.authenticatedBy = authenticatedBy;
     }
 
     public Publisher getPublisher() {

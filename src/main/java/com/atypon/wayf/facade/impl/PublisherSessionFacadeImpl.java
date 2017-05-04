@@ -21,6 +21,7 @@ import com.atypon.wayf.data.cache.CascadingCache;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.device.DeviceStatus;
 import com.atypon.wayf.data.publisher.PublisherSession;
+import com.atypon.wayf.data.publisher.PublisherSessionFilter;
 import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import com.atypon.wayf.facade.DeviceFacade;
 import com.atypon.wayf.facade.IdentityProviderFacade;
@@ -87,10 +88,11 @@ public class PublisherSessionFacadeImpl implements PublisherSessionFacade {
     }
 
     @Override
-    public Single<PublisherSession> read(PublisherSessionQuery query) {
-        return Single.just(query)
+    public Single<PublisherSession> read(String id) {
+        return Single.just(id)
                 .observeOn(Schedulers.io())
-                .flatMap((_query) -> publisherSessionDao.read(_query));
+                .flatMapMaybe((_id) -> publisherSessionDao.read(id))
+                .toSingle();
     }
 
     @Override
@@ -116,21 +118,22 @@ public class PublisherSessionFacadeImpl implements PublisherSessionFacade {
         LOG.debug("Adding relationship");
 
         return Single.zip(
-                        identityProviderFacade.resolve(publisherSession.getIdentityProvider()).subscribeOn(Schedulers.io()),
+                        identityProviderFacade.resolve(publisherSession.getAuthenticatedBy()).subscribeOn(Schedulers.io()),
                         resolveId(publisherSession).subscribeOn(Schedulers.io()),
 
                         (identityProvider, publisherId) -> {
-                            publisherSession.setIdentityProvider(identityProvider);
+                            publisherSession.setAuthenticatedBy(identityProvider);
                             publisherSession.setId(publisherId);
 
                             return publisherSession;
                         }
                 )
-                .flatMapCompletable(publisherSessionToPersist -> publisherSessionDao.addIdpRelationship(publisherSessionToPersist));
+                .flatMap(publisherSessionToPersist -> publisherSessionDao.update(publisherSessionToPersist))
+                .toCompletable();
     }
 
     @Override
-    public Observable<PublisherSession> filter(PublisherSessionQuery filterCriteria) {
+    public Observable<PublisherSession> filter(PublisherSessionFilter filterCriteria) {
         LOG.debug("Filtering for publisher sessions with criteria [{}]", filterCriteria);
 
         return Observable.just(filterCriteria)

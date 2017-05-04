@@ -17,7 +17,6 @@
 package com.atypon.wayf.dao;
 
 
-import com.atypon.wayf.dao.neo4j.Neo4JExecutor;
 import com.google.common.collect.Sets;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.slf4j.Logger;
@@ -30,12 +29,12 @@ import java.util.regex.Pattern;
 public class QueryMapper {
     private static final Logger LOG = LoggerFactory.getLogger(QueryMapper.class);
 
-    private static final Set<String> FIELD_BLACKLIST = Sets.newHashSet(Neo4JExecutor.LIMIT, Neo4JExecutor.OFFSET);
+    private static final Set<String> FIELD_BLACKLIST = Sets.newHashSet(DbExecutor.LIMIT, DbExecutor.OFFSET);
 
     private static final String DELIMITER = ".";
     private static final String REGEX_DELIMITER = "\\.";
-    private static final String FIELD_REGEX = "\\{`?([a-zA-Z0-9\\.]+)`?\\}";
 
+    private static final String FIELD_REGEX = ":([a-zA-Z0-9\\.]+)?";
     private static final Pattern PATTERN = Pattern.compile(FIELD_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final Map<String, List<String>> parsedQueryCache = new HashMap<>(); // Don't let this grow too big
@@ -125,10 +124,6 @@ public class QueryMapper {
 
         if (value.getClass().isEnum()) {
             return value.toString();
-        }
-
-        if (value.getClass().equals(Date.class)) {
-            return ((Date) value).getTime();
         }
 
         if (value.getClass().equals(UUID.class)) {

@@ -26,11 +26,13 @@ import com.atypon.wayf.facade.impl.*;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.Properties;
 
@@ -43,29 +45,24 @@ public class WayfGuiceModule extends AbstractModule {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
             Properties properties = new Properties();
-            properties.load(classLoader.getResourceAsStream("dao/institution-dao-neo4j.properties"));
-            properties.load(classLoader.getResourceAsStream("dao/publisher-session-dao-neo4j.properties"));
-            properties.load(classLoader.getResourceAsStream("dao/publisher-dao-neo4j.properties"));
-            properties.load(classLoader.getResourceAsStream("dao/device-dao-neo4j.properties"));
-            properties.load(classLoader.getResourceAsStream("dao/identity-provider-dao-neo4j.properties"));
-            properties.load(classLoader.getResourceAsStream("dao/publisher-session-id-dao-neo4j.properties"));
+            properties.load(classLoader.getResourceAsStream("dao/publisher-session-dao-db.properties"));
+            properties.load(classLoader.getResourceAsStream("dao/publisher-dao-db.properties"));
+            properties.load(classLoader.getResourceAsStream("dao/device-dao-db.properties"));
+            properties.load(classLoader.getResourceAsStream("dao/identity-provider-dao-db.properties"));
 
             Names.bindProperties(binder(), properties);
 
-            bind(InstitutionFacade.class).to(InstitutionFacadeImpl.class);
-            bind(InstitutionDao.class).to(InstitutionDaoNeo4JImpl.class);
-
             bind(PublisherSessionFacade.class).to(PublisherSessionFacadeImpl.class);
-            bind(PublisherSessionDao.class).to(PublisherSessionDaoNeo4JImpl.class);
+            bind(PublisherSessionDao.class).to(PublisherSessionDaoDbImpl.class);
 
             bind(DeviceFacade.class).to(DeviceFacadeImpl.class);
-            bind(DeviceDao.class).to(DeviceDaoNeo4JImpl.class);
+            bind(DeviceDao.class).to(DeviceDaoDbImpl.class);
 
             bind(PublisherFacade.class).to(PublisherFacadeImpl.class);
-            bind(PublisherDao.class).to(PublisherDaoNeo4JImpl.class);
+            bind(PublisherDao.class).to(PublisherDaoDbImpl.class);
 
             bind(IdentityProviderFacade.class).to(IdentityProviderFacadeImpl.class);
-            bind(IdentityProviderDao.class).to(IdentityProviderDaoNeo4JImpl.class);
+            bind(IdentityProviderDao.class).to(IdentityProviderDaoDbImpl.class);
 
             bind(RedisDao.class)
                     .annotatedWith(Names.named("publisherIdRedisDao"))
@@ -85,7 +82,7 @@ public class WayfGuiceModule extends AbstractModule {
                         private RedisDao l1;
 
                         @Inject
-                        private PublisherSessionIdDaoNeo4JImpl l2;
+                        private PublisherSessionDaoDbImpl l2;
 
                         @Override
                         public CascadingCache<String, String> get() {
@@ -102,7 +99,7 @@ public class WayfGuiceModule extends AbstractModule {
                         private RedisDao l1;
 
                         @Inject
-                        private IdentityProviderDaoNeo4JImpl l2;
+                        private IdentityProviderDaoDbImpl l2;
 
                         @Override
                         public CascadingCache<String, String> get() {
@@ -111,6 +108,18 @@ public class WayfGuiceModule extends AbstractModule {
                         }
                     });
 
+            BasicDataSource dataSource = new BasicDataSource();
+
+            dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+            dataSource.setUsername("root");
+            dataSource.setPassword("test");
+            dataSource.setUrl("jdbc:mysql://localhost:3306/wayf");
+            dataSource.setMaxActive(10);
+            dataSource.setMaxIdle(5);
+            dataSource.setInitialSize(5);
+            dataSource.setValidationQuery("SELECT 1");
+
+            bind(NamedParameterJdbcTemplate.class).toProvider(() -> new NamedParameterJdbcTemplate(dataSource));
         } catch (Exception e) {
             LOG.error("Error initializing Guice", e);
             throw new RuntimeException(e);

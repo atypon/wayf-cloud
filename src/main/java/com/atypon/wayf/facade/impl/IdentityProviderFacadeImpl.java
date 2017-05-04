@@ -59,7 +59,8 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
     public Single<IdentityProvider> read(String id) {
         return Single.just(id)
                 .observeOn(Schedulers.io())
-                .flatMap((_id) -> identityProviderDao.read(_id));
+                .flatMapMaybe((_id) -> identityProviderDao.read(_id))
+                .toSingle();
     }
 
     @Override

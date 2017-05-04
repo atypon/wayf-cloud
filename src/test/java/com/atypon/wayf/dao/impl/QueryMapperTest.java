@@ -31,7 +31,7 @@ import java.util.UUID;
 public class QueryMapperTest {
 
     @Test
-    public void test() throws Exception {
+    public void testQueryMapper() throws Exception {
         PublisherSession publisherSession = new PublisherSession();
         publisherSession.setId(UUID.randomUUID().toString());
         publisherSession.setStatus(PublisherSessionStatus.ACTIVE);
@@ -48,35 +48,20 @@ public class QueryMapperTest {
         publisher.setId(UUID.randomUUID().toString());
         publisherSession.setPublisher(publisher);
 
-        Map<String, Object> arguments = QueryMapper.buildQueryArguments("    MATCH (d:Device {id: {device.id}}) \\\n" +
-                "    MATCH (p:Publisher {id: {`publisher.id`}}) \\\n" +
-                "    CREATE (ps:PublisherSession {\\\n" +
-                "        id: {id}, \\\n" +
-                "        localId: {localId}, \\\n" +
-                "        status: {status}, \\\n" +
-                "        lastActiveDate: {lastActiveDate}, \\\n" +
-                "        createdDate: {createdDate}, \\\n" +
-                "        modifiedDate: {modifiedDate} \\\n" +
-                "    }) \\\n" +
-                "    CREATE (d)-[:HAS_SESSION]->(ps) \\\n" +
-                "    CREATE (ps)-[:VALID_FOR]->(p) \\\n" +
-                "    RETURN ps.id AS id, \\\n" +
-                "        ps.localId AS localId, \\\n" +
-                "        ps.status AS status, \\\n" +
-                "        p.id AS `publisher.id`, \\\n" +
-                "        d.id AS `device.id`, \\\n" +
-                "        ps.lastActiveDate AS lastActiveDate, \\\n" +
-                "        ps.createdDate AS createdDate, \\\n" +
-                "        ps.modifiedDate AS modifiedDate;", publisherSession);
+        Map<String, Object> arguments = QueryMapper.buildQueryArguments("SELECT id AS 'id', " +
+                "        local_id AS 'localId', " +
+                "        status, n" +
+                "        device_id AS 'device.id', " +
+                "        publisher_id AS 'publisher.id' " +
+                "        authenticated_by_id AS 'authenticatedBy.id', " +
+                "        last_active_date AS 'lastActiveDate',  " +
+                "        created_date AS 'createdDate',  " +
+                "        modified_date AS 'modifiedDate' " +
+                "    FROM wayf.publisher_session " +
+                "        WHERE id = :id AND device_id = :device.id;", publisherSession);
 
         Assert.assertEquals(publisherSession.getId(), arguments.get("id"));
-        Assert.assertEquals(publisherSession.getLocalId(), arguments.get("localId"));
-        Assert.assertEquals(publisherSession.getStatus().toString(), arguments.get("status"));
-        Assert.assertEquals(publisherSession.getLastActiveDate().getTime(), arguments.get("lastActiveDate"));
         Assert.assertEquals(publisherSession.getDevice().getId(), arguments.get("device.id"));
-        Assert.assertEquals(publisherSession.getPublisher().getId(), arguments.get("publisher.id"));
-        Assert.assertEquals(publisherSession.getModifiedDate().getTime(), arguments.get("modifiedDate"));
-        Assert.assertEquals(publisherSession.getCreatedDate().getTime(), arguments.get("createdDate"));
 
 
     }

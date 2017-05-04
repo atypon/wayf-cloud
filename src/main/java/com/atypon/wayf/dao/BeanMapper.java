@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class ResultSetProcessor {
-    private static final Logger LOG = LoggerFactory.getLogger(ResultSetProcessor.class);
+public class BeanMapper {
+    private static final Logger LOG = LoggerFactory.getLogger(BeanMapper.class);
 
     private static final String DELIMITER = ".";
     private static final String REGEX_DELIMITER = "\\.";
@@ -40,20 +40,30 @@ public class ResultSetProcessor {
         }
     });
 
-    public <T> T processRow(Map<String, Object> row, Class<T> type) throws Exception {
-        T bean = type.newInstance();
+    public <T> T map(Map<String, Object> row, Class<T> type) {
+        try {
+            T bean = type.newInstance();
 
-        for (String key : row.keySet()) {
-            if (key.contains(DELIMITER)) {
-                String[] pathFields = key.split(REGEX_DELIMITER);
+            for (String key : row.keySet()) {
+                Object value = row.get(key);
 
-                handleNestedValue(bean, pathFields, 0, row.get(key));
-            } else {
-                beanUtilsBean.setProperty(bean, key, row.get(key));
+                if (value == null) {
+                    continue;
+                }
+
+                if (key.contains(DELIMITER)) {
+                    String[] pathFields = key.split(REGEX_DELIMITER);
+
+                    handleNestedValue(bean, pathFields, 0, value);
+                } else {
+                    beanUtilsBean.setProperty(bean, key, value);
+                }
             }
-        }
 
-        return bean;
+            return bean;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not process resultset row [" + row + "] for type [" + type + "]", e);
+        }
     }
 
     private Object handleNestedValue(Object bean, String[] path, int index, Object value) throws Exception {

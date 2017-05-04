@@ -20,12 +20,13 @@ package com.atypon.wayf.dao;
 import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.data.publisher.PublisherFilter;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PublisherDao {
     Single<Publisher> create(Publisher publisher);
-    Single<Publisher> read(String id);
+    Maybe<Publisher> read(String id);
     Single<Publisher> update(Publisher publisher);
     Completable delete(String id);
 

@@ -17,7 +17,6 @@
 package com.atypon.wayf.dao;
 
 
-import com.atypon.wayf.dao.ResultSetProcessor;
 import com.atypon.wayf.data.publisher.PublisherSession;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,17 +24,17 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResultSetProcessorTest {
+public class BeanMapperTest {
 
     @Test
     public void testResultSetProcessor() throws Exception {
-        ResultSetProcessor processor = new ResultSetProcessor();
+        BeanMapper processor = new BeanMapper();
 
         Map<String, Object> row = new HashMap<>();
         row.put("id", "testId");
         row.put("device.id", "testDeviceId");
 
-        PublisherSession publisherSession = processor.processRow(row, PublisherSession.class);
+        PublisherSession publisherSession = processor.map(row, PublisherSession.class);
 
         Assert.assertEquals("testId", publisherSession.getId());
         Assert.assertEquals("testDeviceId", publisherSession.getDevice().getId());

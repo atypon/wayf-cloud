@@ -44,39 +44,17 @@ public class QueryMapperTest {
         device.setId(UUID.randomUUID().toString());
         publisherSession.setDevice(device);
 
-        Publisher publisher = new Publisher();
-        publisher.setId(UUID.randomUUID().toString());
-        publisherSession.setPublisher(publisher);
-
-        Map<String, Object> arguments = QueryMapper.buildQueryArguments("    MATCH (d:Device {id: {device.id}}) \\\n" +
-                "    MATCH (p:Publisher {id: {`publisher.id`}}) \\\n" +
-                "    CREATE (ps:PublisherSession {\\\n" +
-                "        id: {id}, \\\n" +
-                "        localId: {localId}, \\\n" +
-                "        status: {status}, \\\n" +
-                "        lastActiveDate: {lastActiveDate}, \\\n" +
-                "        createdDate: {createdDate}, \\\n" +
-                "        modifiedDate: {modifiedDate} \\\n" +
-                "    }) \\\n" +
-                "    CREATE (d)-[:HAS_SESSION]->(ps) \\\n" +
-                "    CREATE (ps)-[:VALID_FOR]->(p) \\\n" +
-                "    RETURN ps.id AS id, \\\n" +
-                "        ps.localId AS localId, \\\n" +
-                "        ps.status AS status, \\\n" +
-                "        p.id AS `publisher.id`, \\\n" +
-                "        d.id AS `device.id`, \\\n" +
-                "        ps.lastActiveDate AS lastActiveDate, \\\n" +
-                "        ps.createdDate AS createdDate, \\\n" +
-                "        ps.modifiedDate AS modifiedDate;", publisherSession);
+        Map<String, Object> arguments = QueryMapper.buildQueryArguments(
+                "INSERT INTO wayf.publisher_session \\\n" +
+                "  (id, localId, status, device_id, lastActiveDate, createdDate) \\\n" +
+                "    VALUES :id, :localId, :status, :device.id, :lastActiveDate, :createdDate;\n", publisherSession);
 
         Assert.assertEquals(publisherSession.getId(), arguments.get("id"));
         Assert.assertEquals(publisherSession.getLocalId(), arguments.get("localId"));
         Assert.assertEquals(publisherSession.getStatus().toString(), arguments.get("status"));
-        Assert.assertEquals(publisherSession.getLastActiveDate().getTime(), arguments.get("lastActiveDate"));
+        Assert.assertEquals(publisherSession.getLastActiveDate(), arguments.get("lastActiveDate"));
         Assert.assertEquals(publisherSession.getDevice().getId(), arguments.get("device.id"));
-        Assert.assertEquals(publisherSession.getPublisher().getId(), arguments.get("publisher.id"));
-        Assert.assertEquals(publisherSession.getModifiedDate().getTime(), arguments.get("modifiedDate"));
-        Assert.assertEquals(publisherSession.getCreatedDate().getTime(), arguments.get("createdDate"));
+        Assert.assertEquals(publisherSession.getCreatedDate(), arguments.get("createdDate"));
 
 
     }

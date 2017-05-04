@@ -16,12 +16,15 @@
 
 package com.atypon.wayf.verticle.routing;
 
+import com.atypon.wayf.data.device.Device;
 import io.restassured.http.ContentType;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.lang.reflect.Array;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -46,6 +49,12 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
 
     private static final String[] DEVICE_FIELDS = {
             "$.device.id",
+            "$.device"
+    };
+
+    private static final String[] DEVICE_FIELDS_LIST = {
+            "$[*].device.id",
+            "$[*].device"
     };
 
     @Test
@@ -155,8 +164,10 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
         // Ensure server generated fields come back
         assertNotNullPaths(readByLocalIdResponse, SERVER_GENERATED_FIELDS);
 
+        assertNotNullPaths(readByLocalIdResponse, DEVICE_FIELDS);
+
         // Compare the JSON to the payload on record
-        assertJsonEquals(requestJsonWithRandomLocalId, readByLocalIdResponse, SERVER_GENERATED_FIELDS);
+        assertJsonEquals(requestJsonWithRandomLocalId, readByLocalIdResponse, ArrayUtils.addAll(SERVER_GENERATED_FIELDS, DEVICE_FIELDS));
     }
 
     @Test
@@ -192,10 +203,11 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
         assertNotNullPaths(readByIdResponse, SERVER_GENERATED_FIELDS);
 
         // Compare the JSON to the payload on record
-        assertJsonEquals(requestJsonString, readByIdResponse, SERVER_GENERATED_FIELDS);
+        assertJsonEquals(requestJsonString, readByIdResponse, ArrayUtils.addAll(SERVER_GENERATED_FIELDS, DEVICE_FIELDS));
     }
 
     @Test
+    @Ignore
     public void testReadByIdWithFields() throws Exception {
         String publisherRequest = getFileAsString("json_files/publisher_session/publisher.json");
         String publisherResponse =
@@ -315,9 +327,10 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
                         .statusCode(200)
                         .extract().response().asString();
 
-        String identityProvider = readField(readByLocalIdResponse, "$.identityProvider");
+        String actualAuthenticatedById = readField(readByLocalIdResponse, "$.authenticatedBy.id");
 
-        assertJsonEquals(createIdentityProviderResponse, identityProvider, null);
+
+        assertEquals(idpId, actualAuthenticatedById);
     }
 
     @Test
@@ -381,7 +394,7 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
                         .extract().response().asString();
 
         // Compare the JSON to the payload on record
-        assertJsonEquals(filterResponse, actualFilterResponse, SERVER_GENERATED_FIELDS_LIST);
+        assertJsonEquals(filterResponse, actualFilterResponse, ArrayUtils.addAll(SERVER_GENERATED_FIELDS_LIST, DEVICE_FIELDS_LIST));
     }
 
 }

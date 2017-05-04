@@ -19,6 +19,7 @@ package com.atypon.wayf.verticle.routing;
 import com.atypon.wayf.data.IdentityProvider;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.publisher.PublisherSession;
+import com.atypon.wayf.data.publisher.PublisherSessionFilter;
 import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import com.atypon.wayf.facade.PublisherSessionFacade;
 import com.atypon.wayf.request.RequestContextAccessor;
@@ -103,18 +104,17 @@ public class PublisherSessionRouting implements RoutingProvider {
         LOG.debug("Received read PublisherSession request");
 
         return Single.just(routingContext)
-                .map((rc) -> buildFilter(routingContext))
-                .map((query) -> query.setMatchOnId(true))
-                .flatMap((query) -> publisherSessionFacade.read(query));
+                .map((rc) -> RequestReader.readPathArgument(rc, PUBLISHER_SESSION_ID_PARAM_NAME))
+                .flatMap((id) -> publisherSessionFacade.read(id));
     }
 
     public Single<PublisherSession> readPublisherSessionByLocalId(RoutingContext routingContext) {
-        LOG.debug("Received read PublisherSession request");
+        LOG.debug("Received read PublisherSession by localId request");
 
         return Single.just(routingContext)
                 .map((rc) -> buildFilter(rc))
-                .map((query) -> query.setMatchOnLocalId(true))
-                .flatMap((query) -> publisherSessionFacade.read(query));
+                .flatMapObservable((query) -> publisherSessionFacade.filter(query))
+                .firstOrError();
     }
 
     public Single<PublisherSession> updatePublisherSession(RoutingContext routingContext) {
@@ -137,7 +137,7 @@ public class PublisherSessionRouting implements RoutingProvider {
 
                     PublisherSession publisherSession = new PublisherSession();
                     publisherSession.setLocalId(localId);
-                    publisherSession.setIdentityProvider(identityProvider);
+                    publisherSession.setAuthenticatedBy(identityProvider);
 
                     return publisherSession;
                 })
@@ -160,7 +160,7 @@ public class PublisherSessionRouting implements RoutingProvider {
                 .flatMapCompletable((publisherSessionId) -> publisherSessionFacade.delete(publisherSessionId));
     }
 
-    private PublisherSessionQuery buildFilter(RoutingContext routingContext) {
+    private PublisherSessionFilter buildFilter(RoutingContext routingContext) {
         String deviceId =  RequestReader.getQueryValue(routingContext, DEVICE_ID_QUERY_PARAM);
 
         String concatFields = RequestReader.getQueryValue(routingContext, "fields");
@@ -174,10 +174,8 @@ public class PublisherSessionRouting implements RoutingProvider {
         String id = RequestReader.readPathArgument(routingContext, PUBLISHER_SESSION_ID_PARAM_NAME);
         String localId = RequestReader.readPathArgument(routingContext, PUBLISHER_SESSION_LOCAL_ID_PARAM_NAME);
 
-        return new PublisherSessionQuery()
+        return new PublisherSessionFilter()
                 .setDeviceId(deviceId)
-                .setFields(fields)
-                .setId(id)
                 .setLocalId(localId);
     }
 }

@@ -19,17 +19,21 @@ package com.atypon.wayf.data.publisher;
 import java.util.List;
 
 public class PublisherFilter {
-    private List<String> ids;
+    private String[] ids;
 
     public PublisherFilter() {
     }
 
-    public List<String> getIds() {
+    public String[] getIds() {
         return ids;
     }
 
-    public PublisherFilter setIds(List<String> ids) {
+    public PublisherFilter setIds(String[] ids) {
         this.ids = ids;
         return this;
+    }
+
+    public PublisherFilter setIds(List<String> ids) {
+        return setIds(ids.toArray(new String[0]));
     }
 }

@@ -17,11 +17,12 @@
 package com.atypon.wayf.dao;
 
 import com.atypon.wayf.data.IdentityProvider;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 public interface IdentityProviderDao {
 
     Single<IdentityProvider> create(IdentityProvider identityProvider);
-    Single<IdentityProvider> read(String id);
+    Maybe<IdentityProvider> read(String id);
 
 }

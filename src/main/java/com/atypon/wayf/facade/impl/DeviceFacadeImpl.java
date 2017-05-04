@@ -54,6 +54,7 @@ public class DeviceFacadeImpl implements DeviceFacade {
         LOG.debug("Reading device with id [{}]", id);
         return Single.just(id)
                 .observeOn(Schedulers.io())
-                .flatMap((_id) -> deviceDao.read(_id));
+                .flatMapMaybe((_id) -> deviceDao.read(_id))
+                .toSingle();
     }
 }

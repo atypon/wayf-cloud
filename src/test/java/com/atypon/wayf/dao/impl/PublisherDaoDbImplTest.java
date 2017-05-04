@@ -34,10 +34,10 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PublisherDaoNeo4JImplTest {
+public class PublisherDaoDbImplTest {
 
     @Inject
-    private PublisherDaoNeo4JImpl dao;
+    private PublisherDaoDbImpl dao;
 
     @Before
     public void setUp() {

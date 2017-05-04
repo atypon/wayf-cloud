@@ -43,7 +43,8 @@ public class PublisherFacadeImpl implements PublisherFacade {
     @Override
     public Single<Publisher> read(String id) {
         return Single.just(id)
-                .flatMap((_id) -> publisherDao.read(_id));
+                .flatMapMaybe((_id) -> publisherDao.read(_id))
+                .toSingle();
     }
 
     @Override

@@ -17,18 +17,18 @@
 package com.atypon.wayf.dao;
 
 import com.atypon.wayf.data.publisher.PublisherSession;
+import com.atypon.wayf.data.publisher.PublisherSessionFilter;
 import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PublisherSessionDao {
     Single<PublisherSession> create(PublisherSession publisherSession);
-    Single<PublisherSession> read(PublisherSessionQuery query);
+    Maybe<PublisherSession> read(String id);
     Single<PublisherSession> update(PublisherSession publisherSession);
     Completable delete(String id);
 
-    Observable<PublisherSession> filter(PublisherSessionQuery filterCritera);
-
-    Completable addIdpRelationship(PublisherSession publisherSession);
+    Observable<PublisherSession> filter(PublisherSessionFilter filterCriteria);
 }

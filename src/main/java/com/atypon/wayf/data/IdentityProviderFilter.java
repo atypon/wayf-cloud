@@ -14,24 +14,32 @@
  * limitations under the License.
  */
 
-package com.atypon.wayf.dao.neo4j;
+package com.atypon.wayf.data;
 
-import java.util.Map;
+import java.util.List;
 
-class Neo4JRequest {
-    private String cypher;
-    private Map<String, Object> args;
+public class IdentityProviderFilter {
+    private List<String> ids;
+    private String entityId;
 
-    public Neo4JRequest(String cypher, Map<String, Object> args) {
-        this.cypher = cypher;
-        this.args = args;
+    public IdentityProviderFilter() {
     }
 
-    public String getCypher() {
-        return cypher;
+    public List<String> getIds() {
+        return ids;
     }
 
-    public Map<String, Object> getArgs() {
-        return args;
+    public IdentityProviderFilter setIds(List<String> ids) {
+        this.ids = ids;
+        return this;
+    }
+
+    public String getEntityId() {
+        return entityId;
+    }
+
+    public IdentityProviderFilter setEntityId(String entityId) {
+        this.entityId = entityId;
+        return this;
     }
 }

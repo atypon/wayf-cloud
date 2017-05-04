@@ -31,10 +31,10 @@ import org.junit.Test;
 
 
 
-public class DeviceDaoNeo4JImplTest {
+public class DeviceDaoDbImplTest {
 
     @Inject
-    private DeviceDaoNeo4JImpl dao;
+    private DeviceDaoDbImpl dao;
 
     @Before
     public void setUp() {
@@ -54,7 +54,6 @@ public class DeviceDaoNeo4JImplTest {
         Assert.assertEquals(DeviceStatus.ACTIVE, createdDevice.getStatus());
         Assert.assertNotNull(createdDevice.getId());
         Assert.assertNotNull(createdDevice.getCreatedDate());
-        Assert.assertNotNull(createdDevice.getModifiedDate());
     }
 
     @Test
@@ -69,6 +68,5 @@ public class DeviceDaoNeo4JImplTest {
         Assert.assertEquals(DeviceStatus.ACTIVE, readDevice.getStatus());
         Assert.assertNotNull(readDevice.getId());
         Assert.assertNotNull(readDevice.getCreatedDate());
-        Assert.assertNotNull(readDevice.getModifiedDate());
     }
 }
