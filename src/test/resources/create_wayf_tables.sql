@@ -25,7 +25,7 @@ CREATE TABLE `device` (
   `_id` int(11) NOT NULL AUTO_INCREMENT,
   `id` varchar(36) NOT NULL,
   `status` varchar(15) NOT NULL,
-  `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_date` timestamp NOT NULL,
   `modified_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
@@ -45,7 +45,7 @@ CREATE TABLE `identity_provider` (
   `name` varchar(50) NOT NULL,
   `entity_id` varchar(50) NOT NULL,
   `federation_id` varchar(50) NOT NULL,
-  `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_date` timestamp NOT NULL,
   `modified_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
@@ -80,7 +80,7 @@ CREATE TABLE `publisher` (
   `id` varchar(36) NOT NULL,
   `name` varchar(45) NOT NULL,
   `status` varchar(15) NOT NULL,
-  `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_date` timestamp NOT NULL,
   `modified_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
@@ -102,9 +102,9 @@ CREATE TABLE `publisher_session` (
   `device_id` varchar(36) DEFAULT NULL,
   `authenticated_by_id` varchar(36) DEFAULT NULL,
   `publisher_id` varchar(36) DEFAULT NULL,
-  `last_active_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_active_date` timestamp NOT NULL,
+  `created_date` timestamp NOT NULL,
+  `modified_date` timestamp NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

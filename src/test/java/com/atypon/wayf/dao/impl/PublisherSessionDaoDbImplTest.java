@@ -74,6 +74,5 @@ public class PublisherSessionDaoDbImplTest {
         Assert.assertEquals(publisherSession.getLocalId(), read.getLocalId());
         Assert.assertEquals(publisherSession.getDevice().getId(), read.getDevice().getId());
         Assert.assertNotNull(read.getCreatedDate());
-        Assert.assertNotNull(read.getModifiedDate());
     }
 }

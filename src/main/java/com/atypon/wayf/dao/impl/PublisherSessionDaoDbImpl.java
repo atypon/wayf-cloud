@@ -21,7 +21,6 @@ import com.atypon.wayf.dao.PublisherSessionDao;
 import com.atypon.wayf.data.cache.KeyValueCache;
 import com.atypon.wayf.data.publisher.PublisherSession;
 import com.atypon.wayf.data.publisher.PublisherSessionFilter;
-import com.atypon.wayf.data.publisher.PublisherSessionQuery;
 import com.atypon.wayf.reactivex.DaoPolicies;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
