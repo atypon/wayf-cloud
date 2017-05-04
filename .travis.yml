@@ -1,7 +1,10 @@
+dist: trusty
+sudo: required
 
 language: java
 
 jdk:
+
   - oraclejdk8
 
 services:
@@ -11,6 +14,5 @@ services:
 before_script:
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('test') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
   - mysql -h localhost -u root -ptest < src/test/resources/create_wayf_db.sql
-  - cat src/test/resources/create_wayf_tables.sql
   - mysql -h localhost -u root -ptest wayf < src/test/resources/create_wayf_tables.sql
 
