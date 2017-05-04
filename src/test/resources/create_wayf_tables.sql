@@ -26,7 +26,7 @@ CREATE TABLE `device` (
   `id` varchar(36) NOT NULL,
   `status` varchar(15) NOT NULL,
   `created_date` timestamp NOT NULL,
-  `modified_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `modified_date` timestamp NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=155 DEFAULT CHARSET=latin1;
@@ -46,7 +46,7 @@ CREATE TABLE `identity_provider` (
   `entity_id` varchar(50) NOT NULL,
   `federation_id` varchar(50) NOT NULL,
   `created_date` timestamp NOT NULL,
-  `modified_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `modified_date` timestamp NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
@@ -81,7 +81,7 @@ CREATE TABLE `publisher` (
   `name` varchar(45) NOT NULL,
   `status` varchar(15) NOT NULL,
   `created_date` timestamp NOT NULL,
-  `modified_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `modified_date` timestamp NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`_id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=latin1;
