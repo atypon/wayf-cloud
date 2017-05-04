@@ -18,7 +18,6 @@
 --
 -- Table structure for table `device`
 --
-USE DATABASE wayf;
 
 DROP TABLE IF EXISTS `device`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
