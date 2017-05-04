@@ -36,12 +36,14 @@ public class PublisherSessionRoutingTest extends BaseHttpTest {
     private static final String[] SERVER_GENERATED_FIELDS = {
             "$.id",
             "$.createdDate",
+            "$.modifiedDate",
             "$.lastActiveDate"
     };
 
     private static final String[] SERVER_GENERATED_FIELDS_LIST = {
             "$[*].id",
             "$[*].createdDate",
+            "$[*].modifiedDate",
             "$[*].lastActiveDate"
     };
 
