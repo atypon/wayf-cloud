@@ -51,3 +51,5 @@ The values may be overriden but all of the keys are required. Create this file i
 6. Start the WAY application: `java -jar -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory target/wayf-cloud-1.0-SNAPSHOT-fat.jar -Dwayf.conf.dir=[PATH_TO_WAYF.PROPERTIES]`
     1. `vertx.logger-delegate-factory-class-name` enables the vert.x logging to work with WAYF cloud's logging system
     2. `wayf.conf.dir` tells the application where to load the wayf environment configuration from. If no value is specified, the application will attempt to load it from the classpath
+    
+    test
