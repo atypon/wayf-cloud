@@ -60,6 +60,7 @@ public class DeviceRoutingProvider implements RoutingProvider {
     private static final String READ_MY_DEVICE = "/1/mydevice";
     private static final String FILTER_DEVICE = "/1/devices";
     private static final String ADD_DEVICE_PUBLISHER_RELATIONSHIP = "/1/device/:localId";
+    private static final String CREATE_GLOBAL_ID = "/1/device/";
 
     @Inject
     private ResponseWriter responseWriter;
@@ -94,6 +95,12 @@ public class DeviceRoutingProvider implements RoutingProvider {
         router.get(FILTER_DEVICE).handler(handlerFactory.observable((rc) -> filterDevice(rc)));
         router.post(ADD_DEVICE_PUBLISHER_RELATIONSHIP).handler(handlerFactory.completable((rc) -> registerLocalId(rc)));
         router.patch(ADD_DEVICE_PUBLISHER_RELATIONSHIP).handler(handlerFactory.cookieSingle((rc) -> createPublisherDeviceRelationship(rc)));
+        router.post(CREATE_GLOBAL_ID).handler(handlerFactory.single(rc -> createGlobalId()));
+    }
+
+    public Single<Device> createGlobalId() {
+        LOG.debug("Received create Device request");
+        return deviceFacade.create(new Device());
     }
 
     public Single<Device> readDevice(RoutingContext routingContext) {

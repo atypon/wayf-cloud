@@ -19,6 +19,7 @@ package com.atypon.wayf.facade.impl;
 import com.atypon.wayf.cache.Cache;
 import com.atypon.wayf.dao.PublisherDao;
 import com.atypon.wayf.data.authentication.AuthenticatedEntity;
+import com.atypon.wayf.data.authentication.AuthorizationToken;
 import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.data.publisher.PublisherQuery;
 import com.atypon.wayf.data.publisher.PublisherStatus;
@@ -81,6 +82,10 @@ public class PublisherFacadeImpl implements PublisherFacade {
                     // Set the newly created contact on the publisher
                     publisher.setContact(contact);
 
+                    // Generate the publisher specific Javascript widget
+                    clientJsFacade.generateWidgetForPublisher(publisher).subscribe(publisher::setWidgetLocation);
+
+
                     // Create the publisher
                     return publisherDao.create(publisher);
                 })
@@ -89,19 +94,16 @@ public class PublisherFacadeImpl implements PublisherFacade {
                         Single.zip(
                                 // Create an authorization token for the newly created publisher
                                 authenticationFacade.createCredentials(authorizationTokenFactory.generateToken(createdPublisher))
-                                        .compose(single -> FacadePolicies.applySingle(single)),
-
-                                // Generate the publisher specific Javascript widget
-                                clientJsFacade.generateWidgetForPublisher(createdPublisher).compose(single -> FacadePolicies.applySingle(single)),
+                                        .compose(FacadePolicies::applySingle),
 
                                 // Approve the publisher registration if one existed
-                                handleRegistrationApproval(publisher).compose(single -> FacadePolicies.applySingle(single)),
+                                handleRegistrationApproval(publisher).compose(FacadePolicies::applySingle),
 
                                 // Combine the results with the previously created publisher
-                                (token, filename, approvedRegistration) -> {
+                                (token, approvedRegistration) -> {
                                     createdPublisher.setToken(token);
-                                    createdPublisher.setWidgetLocation(filename);
                                     createdPublisher.setContact(publisher.getContact());
+                                    createdPublisher.setWidgetLocation(publisher.getWidgetLocation());
                                     return createdPublisher;
                                 }
                         )
@@ -115,7 +117,23 @@ public class PublisherFacadeImpl implements PublisherFacade {
 
     @Override
     public Observable<Publisher> filter(PublisherQuery filter) {
-        return publisherDao.filter(filter);
+
+        boolean isAdminView = PublisherQuery.ADMIN_VIEW.equals(filter.getView());
+
+        if (isAdminView) {
+            AuthenticatedEntity.authenticatedAsAdmin(RequestContextAccessor.get().getAuthenticated());
+        }
+
+        return publisherDao.filter(filter).flatMap(publisher -> {
+            if (!isAdminView) {
+                publisher.setWidgetLocation(null);
+            } else {
+                authenticationFacade.getCredentialsForAuthenticatable(publisher).filter(token -> token instanceof AuthorizationToken).
+                        singleOrError().onErrorReturnItem(new AuthorizationToken()).subscribe(credentials -> publisher.setToken((AuthorizationToken)credentials));
+
+            }
+            return Observable.just(publisher);
+        });
     }
 
     @Override

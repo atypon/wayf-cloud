@@ -232,4 +232,80 @@ public class PublisherTestUtil {
 
         assertJsonEquals(response, errorResponse, errorResponseGeneratedFields);
     }
+
+    public void testFilterPublisherAdmin(String adminToken, long publisherId, String response){
+        AuthorizationToken adminAuthToken = new AuthorizationToken();
+        adminAuthToken.setValue(adminToken);
+        adminAuthToken.setType(AuthorizationTokenType.API_TOKEN);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", AuthorizationTokenTestUtil.generateApiTokenHeaderValue(adminAuthToken));
+
+        String readResponse =
+                requestFactory
+                        .request()
+                        .headers(headers)
+                        .contentType(ContentType.JSON)
+                        .method(Method.GET)
+                        .url("/1/publishers?view=ADMIN&ids=" + publisherId)
+                        .execute()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+
+        String[] readResponseGeneratedFields = {
+                "$[*].id",
+                "$[*].code",
+                "$[*].contact.id",
+                "$[*].widgetLocation",
+                "$[*].token.value",
+                "$[*].createdDate"
+        };
+
+        assertNotNullPaths(readResponse, readResponseGeneratedFields);
+        assertJsonEquals(response, readResponse, readResponseGeneratedFields);
+    }
+
+    public void testFilterPublisher(long publisherId, String response){
+
+        String readResponse =
+                requestFactory
+                        .request()
+                        .contentType(ContentType.JSON)
+                        .method(Method.GET)
+                        .url("/1/publishers?ids=" + publisherId)
+                        .execute()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+
+        String[] readResponseGeneratedFields = {
+                "$[*].id",
+                "$[*].code",
+                "$[*].contact.id",
+                "$[*].createdDate"
+        };
+
+        assertNotNullPaths(readResponse, readResponseGeneratedFields);
+        assertJsonEquals(response, readResponse, readResponseGeneratedFields);
+    }
+
+    public void testPublisherAdminNoCredentials(Long publisherId, String expectedResponse) {
+        String response =
+                requestFactory
+                        .request()
+                        .contentType(ContentType.JSON)
+                        .method(Method.GET)
+                        .url("/1/publishers?view=ADMIN&ids=" + publisherId)
+                        .execute()
+                        .statusCode(401)
+                        .extract().response().asString();
+
+        String[] responseGeneratedFields = {
+                "$.stacktrace"
+        };
+
+        assertNotNullPaths(response, responseGeneratedFields);
+        assertJsonEquals(expectedResponse, response, responseGeneratedFields);
+    }
 }

@@ -156,6 +156,7 @@ CREATE TABLE `publisher` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `code` varchar(50) NOT NULL,
+  `widget_location` varchar(255) NULL,
   `salt` varchar(30) NOT NULL,
   `status` varchar(15) NOT NULL,
   `contact_id` int(11) NULL,
