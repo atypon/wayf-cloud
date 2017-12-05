@@ -129,7 +129,8 @@ public class DeviceRoutingProvider implements RoutingProvider {
         String deviceId = RequestReader.getCookieValue(routingContext, RequestReader.DEVICE_ID);
         query.setGlobalId(deviceId);
 
-        return deviceFacade.read(query);
+        Observable<Device> device = deviceFacade.filter(query);
+        return device.isEmpty().blockingGet() ? createGlobalId(routingContext) : device.singleOrError();
 
     }
 
