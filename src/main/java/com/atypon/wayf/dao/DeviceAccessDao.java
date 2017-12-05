@@ -18,6 +18,7 @@ package com.atypon.wayf.dao;
 
 import com.atypon.wayf.data.device.access.DeviceAccess;
 import com.atypon.wayf.data.device.access.DeviceAccessQuery;
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -27,4 +28,6 @@ public interface DeviceAccessDao {
     Maybe<DeviceAccess> read(Long id);
 
     Observable<DeviceAccess> filter(DeviceAccessQuery query);
+
+    Completable delete(Long deviceId);
 }

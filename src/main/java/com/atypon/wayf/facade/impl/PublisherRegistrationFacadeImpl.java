@@ -22,7 +22,6 @@ import com.atypon.wayf.data.authentication.AuthenticatedEntity;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistration;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistrationQuery;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistrationStatus;
-import com.atypon.wayf.data.user.User;
 import com.atypon.wayf.data.user.UserQuery;
 import com.atypon.wayf.facade.PublisherRegistrationFacade;
 import com.atypon.wayf.facade.UserFacade;
@@ -46,14 +45,11 @@ import java.util.Map;
 @Singleton
 public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFacade {
     private static final Logger LOG = LoggerFactory.getLogger(PublisherRegistrationFacadeImpl.class);
-
+    private static final InflationPolicy CREATE_RESPONSE_INFLATION = new InflationPolicy().addChildPolicy(PublisherRegistrationQuery.CONTACT_FIELD, null);
     @Inject
     private UserFacade userFacade;
-
     @Inject
     private PublisherRegistrationDao publisherRegistrationDao;
-
-    private static final InflationPolicy CREATE_RESPONSE_INFLATION = new InflationPolicy().addChildPolicy(PublisherRegistrationQuery.CONTACT_FIELD, null);
 
     public PublisherRegistrationFacadeImpl() {
     }
@@ -70,8 +66,8 @@ public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFac
 
         return userFacade.create(publisherRegistration.getContact())
                 .map((contactUser) -> {
-                        publisherRegistration.setContact(contactUser);
-                        return publisherRegistration;
+                    publisherRegistration.setContact(contactUser);
+                    return publisherRegistration;
                 })
                 .compose((single) -> FacadePolicies.applySingle(single))
                 .flatMap((_publisherRegistration) -> publisherRegistrationDao.create(_publisherRegistration))
@@ -86,9 +82,9 @@ public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFac
         LOG.debug("Reading publisher registration with query [{}]", query);
 
         return FacadePolicies.singleOrException(
-                        publisherRegistrationDao.read(query.getId()).compose((maybe) -> FacadePolicies.applyMaybe(maybe)),
-                        HttpStatus.SC_NOT_FOUND,
-                        "Could not read PublisherRegistration with id {}", query.getId())
+                publisherRegistrationDao.read(query.getId()).compose((maybe) -> FacadePolicies.applyMaybe(maybe)),
+                HttpStatus.SC_NOT_FOUND,
+                "Could not read PublisherRegistration with id {}", query.getId())
                 .flatMap((publisherRegistration) -> populate(query, Lists.newArrayList(publisherRegistration)).toSingle(() -> publisherRegistration));
     }
 
@@ -136,4 +132,13 @@ public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFac
                                 .concatWith(Observable.fromIterable(registrationList))
                 );
     }
+
+    public Completable delete(Long contactID) {
+        if (contactID == null) {
+            return Completable.complete();
+        }
+        return publisherRegistrationDao.delete(contactID).toCompletable();
+
+    }
+
 }

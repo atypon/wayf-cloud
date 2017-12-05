@@ -23,8 +23,12 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface UserFacade {
+
     Single<User> create(User user);
+
     Single<User> read(Long id);
+
     Completable delete(Long id);
+
     Observable<User> filter(UserQuery query);
 }

@@ -16,6 +16,7 @@
 
 package com.atypon.wayf.verticle.routing;
 
+import com.atypon.wayf.data.InflationPolicyParser;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.device.DeviceQuery;
 import com.atypon.wayf.data.device.access.DeviceAccess;
@@ -54,6 +55,9 @@ public class DeviceAccessRouting implements RoutingProvider {
     @Inject
     private DeviceFacade deviceFacade;
 
+    @Inject
+    private InflationPolicyParser<String> inflationPolicyParser;
+
     public DeviceAccessRouting() {
     }
 
@@ -76,6 +80,8 @@ public class DeviceAccessRouting implements RoutingProvider {
         if (type != null) {
             deviceAccessQuery.setType(DeviceAccessType.valueOf(type));
         }
+
+        deviceAccessQuery.setInflationPolicy(inflationPolicyParser.parse(DeviceAccessQuery.PUBLISHER_FIELD + "," + DeviceAccessQuery.IDENTITY_PROVIDER));
 
         return deviceAccessFacade.filter(deviceAccessQuery);
     }

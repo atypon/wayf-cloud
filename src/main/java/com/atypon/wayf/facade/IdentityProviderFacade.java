@@ -19,12 +19,16 @@ package com.atypon.wayf.facade;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.identity.IdentityProvider;
 import com.atypon.wayf.data.identity.IdentityProviderQuery;
+import com.atypon.wayf.data.identity.external.IdPExternalId;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import java.util.List;
+
 public interface IdentityProviderFacade {
     Single<IdentityProvider> create(IdentityProvider identityProvider);
+
     Single<IdentityProvider> read(Long id);
 
     Completable blockIdentityProviderForLocalId(String localId, Long idpId);
@@ -38,4 +42,6 @@ public interface IdentityProviderFacade {
     Single<IdentityProvider> resolve(IdentityProvider identityProvider);
 
     Single<IdentityProvider> recordIdentityProviderUse(String localId, IdentityProvider identityProvider);
+
+    Single<IdentityProvider> resolveIdpExternalIds(IdentityProvider identityProvider, List<IdPExternalId> externalIds);
 }

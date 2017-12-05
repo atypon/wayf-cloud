@@ -19,6 +19,7 @@ package com.atypon.wayf.facade.impl;
 import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.identity.IdentityProvider;
 import com.atypon.wayf.data.identity.IdentityProviderQuery;
+import com.atypon.wayf.data.identity.external.IdPExternalId;
 import com.atypon.wayf.facade.IdentityProviderFacade;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -68,6 +69,11 @@ public class IdentityProviderFacadeMockImpl implements IdentityProviderFacade {
 
     @Override
     public Single<IdentityProvider> recordIdentityProviderUse(String localId, IdentityProvider identityProvider) {
+        return null;
+    }
+
+    @Override
+    public Single<IdentityProvider> resolveIdpExternalIds(IdentityProvider identityProvider, List<IdPExternalId> externalIds) {
         return null;
     }
 

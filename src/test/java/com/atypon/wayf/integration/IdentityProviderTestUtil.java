@@ -144,7 +144,7 @@ public class IdentityProviderTestUtil {
         }
 
         for (int i = 0; i < count - 1; i++) {
-            assertEquals(ids[i], ids[i+1]);
+            assertEquals(ids[i], ids[i + 1]);
         }
 
         return ids[0];
@@ -206,5 +206,70 @@ public class IdentityProviderTestUtil {
                         .extract().response().asString();
 
         assertTrue(removeIdpResponse.isEmpty());
+    }
+
+    public void addIdpExternalId(Long idpId, String idpBodyJson, String expectedResponseJson) {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", AuthorizationTokenTestUtil.generateDefaultApiTokenHeaderValue());
+
+        String addIdpExternalIdResponse =
+                requestFactory
+                        .request()
+                        .contentType(ContentType.JSON)
+                        .headers(headers)
+                        .body(idpBodyJson)
+                        .method(Method.POST)
+                        .url("/1/identityProvider/external/" + idpId)
+                        .execute()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+//        Long id = Long.valueOf(readField(expectedResponseJson, "$.id"));
+
+        String[] addIdpExternalIdResponseGeneratedFields = {
+                "$.id",
+                "$.createdDate"
+        };
+
+        assertJsonEquals(expectedResponseJson, addIdpExternalIdResponse, addIdpExternalIdResponseGeneratedFields);
+    }
+
+    public void readIdpExternalIdByIdpId(Long idpId, String expectedResponseJson) {
+
+        String getIdpExternalIdResponse =
+                requestFactory
+                        .request()
+                        .contentType(ContentType.JSON)
+                        .method(Method.GET)
+                        .url("/1/identityProvider/external/" + idpId)
+                        .execute()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+        String[] getIdpExternalIdResponseGeneratedFields = {
+                "$.id"
+        };
+
+        assertJsonEquals(expectedResponseJson, getIdpExternalIdResponse, getIdpExternalIdResponseGeneratedFields);
+    }
+
+    public void readIdpExternalIdByIdpIdAndExternalProvider(Long idpId, String provider, String expectedResponseJson) {
+
+        String getIdpExternalIdResponse =
+                requestFactory
+                        .request()
+                        .contentType(ContentType.JSON)
+                        .method(Method.GET)
+                        .url("/1/identityProvider/external/" + idpId + "?provider=" + provider +  "&limit=" + 1 + "&offset=0")
+                        .execute()
+                        .statusCode(200)
+                        .extract().response().asString();
+
+        String[] getIdpExternalIdResponseGeneratedFields = {
+                "$.id"
+        };
+
+        assertJsonEquals(expectedResponseJson, getIdpExternalIdResponse, getIdpExternalIdResponseGeneratedFields);
     }
 }

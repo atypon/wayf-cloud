@@ -1,0 +1,16 @@
+{
+  "entityId": "sample-saml-entity-id-2",
+  "federationId": "sample-saml-federation-id-2",
+  "type" : "SAML",
+  "name" : "SAML Entity 2",
+  "externalIds": [
+    {
+      "provider": "REDLINK",
+      "id": "test"
+    },
+    {
+      "provider": "ISNI",
+      "id": "test2"
+    }
+  ]
+}

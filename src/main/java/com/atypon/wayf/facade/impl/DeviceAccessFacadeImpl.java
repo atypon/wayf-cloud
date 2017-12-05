@@ -178,4 +178,9 @@ public class DeviceAccessFacadeImpl implements DeviceAccessFacade {
 
                 );
     }
+
+    public Completable delete(Long deviceId){
+        return deviceAccessDao.delete(deviceId);
+    }
+
 }

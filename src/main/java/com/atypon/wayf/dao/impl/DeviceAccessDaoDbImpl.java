@@ -17,6 +17,7 @@
 package com.atypon.wayf.dao.impl;
 
 import com.atypon.wayf.dao.DeviceAccessDao;
+import com.atypon.wayf.data.device.Device;
 import com.atypon.wayf.data.device.access.DeviceAccess;
 import com.atypon.wayf.data.device.access.DeviceAccessQuery;
 import com.atypon.wayf.database.DbExecutor;
@@ -24,6 +25,7 @@ import com.atypon.wayf.reactivex.DaoPolicies;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -45,6 +47,10 @@ public class DeviceAccessDaoDbImpl implements DeviceAccessDao {
     @Inject
     @Named("device-access.dao.db.filter")
     private String filterSql;
+
+    @Inject
+    @Named("device-access.dao.db.delete")
+    private String deleteSql;
 
     @Inject
     private DbExecutor dbExecutor;
@@ -77,4 +83,14 @@ public class DeviceAccessDaoDbImpl implements DeviceAccessDao {
                 .compose((observable) -> DaoPolicies.applyObservable(observable))
                 .flatMap((_query) -> dbExecutor.executeSelect(filterSql, _query, DeviceAccess.class));
     }
+
+    @Override
+    public Completable delete(Long deviceId){
+        Device device = new Device();
+        device.setId(deviceId);
+        DeviceAccess deviceAccess = new DeviceAccess();
+        deviceAccess.setDevice(device);
+        return dbExecutor.executeUpdate(deleteSql, deviceAccess).toCompletable();
+    }
+
 }

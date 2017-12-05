@@ -18,15 +18,20 @@ package com.atypon.wayf.facade;
 
 import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.data.publisher.PublisherQuery;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PublisherFacade {
     Single<Publisher> create(Publisher publisher);
+
     Single<Publisher> read(Long id);
+
     Observable<Publisher> filter(PublisherQuery filter);
 
     Single<Publisher> lookupCode(String publisherCode);
+
+    Completable delete(Long publisherId);
 
     String getPublishersSalt(Long publisherId);
 }

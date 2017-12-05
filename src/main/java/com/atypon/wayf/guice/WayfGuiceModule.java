@@ -91,6 +91,7 @@ public class WayfGuiceModule extends AbstractModule {
             properties.load(classLoader.getResourceAsStream("dao/publisher-registration-dao-db.properties"));
             properties.load(classLoader.getResourceAsStream("dao/user-dao-db.properties"));
             properties.load(classLoader.getResourceAsStream("dao/password-credentials-dao-db.properties"));
+            properties.load(classLoader.getResourceAsStream("dao/external-id-dao-db.properties"));
 
             Names.bindProperties(binder(), properties);
 
@@ -125,6 +126,8 @@ public class WayfGuiceModule extends AbstractModule {
             bind(PublisherRegistrationFacade.class).to(PublisherRegistrationFacadeImpl.class);
 
             bind(IdentityProviderFacade.class).to(IdentityProviderFacadeImpl.class);
+            bind(IdpExternalIdFacade.class).to(IdpExternalIdFacadeImpl.class);
+            bind(IdPExternalIdDao.class).to(IdPExternalIdDaoImpl.class);
 
             bind(ErrorLoggerFacade.class).to(ErrorLoggerFacadeImpl.class);
             bind(ErrorLoggerDao.class).to(ErrorLoggerDaoDbImpl.class);

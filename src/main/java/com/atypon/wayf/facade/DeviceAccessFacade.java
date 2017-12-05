@@ -26,4 +26,6 @@ public interface DeviceAccessFacade {
     Single<DeviceAccess> create(DeviceAccess publisherSession);
 
     Observable<DeviceAccess> filter(DeviceAccessQuery query);
+
+    Completable delete(Long deviceId);
 }

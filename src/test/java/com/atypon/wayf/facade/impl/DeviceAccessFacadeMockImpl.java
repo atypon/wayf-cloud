@@ -19,6 +19,7 @@ package com.atypon.wayf.facade.impl;
 import com.atypon.wayf.data.device.access.DeviceAccess;
 import com.atypon.wayf.data.device.access.DeviceAccessQuery;
 import com.atypon.wayf.facade.DeviceAccessFacade;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -43,6 +44,11 @@ public class DeviceAccessFacadeMockImpl implements DeviceAccessFacade {
     @Override
     public Observable<DeviceAccess> filter(DeviceAccessQuery query) {
         return Observable.fromIterable(deviceAccessList);
+    }
+
+    @Override
+    public Completable delete(Long deviceId) {
+        return Completable.complete();
     }
 
 }

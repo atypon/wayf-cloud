@@ -16,7 +16,16 @@
 
 package com.atypon.wayf.data.identity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import java.util.Date;
+
+@JsonPropertyOrder({
+        "provider",
+        "type",
+        "name",
+        "externalIds"
+})
 
 public class OauthEntity extends IdentityProvider {
     private OauthProvider provider;

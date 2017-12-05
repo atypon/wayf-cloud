@@ -18,13 +18,19 @@ package com.atypon.wayf.facade;
 
 import com.atypon.wayf.data.publisher.registration.PublisherRegistration;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistrationQuery;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PublisherRegistrationFacade {
+
     Single<PublisherRegistration> create(PublisherRegistration publisherRegistration);
+
     Single<PublisherRegistration> read(PublisherRegistrationQuery query);
+
     Single<PublisherRegistration> updateStatus(PublisherRegistration publisherRegistration);
+
+    Completable delete(Long contactID);
 
     Observable<PublisherRegistration> filter(PublisherRegistrationQuery query);
 }

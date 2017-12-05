@@ -156,6 +156,7 @@ CREATE TABLE `publisher` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `code` varchar(50) NOT NULL,
+  `widget_location` varchar(255) NULL,
   `salt` varchar(30) NOT NULL,
   `status` varchar(15) NOT NULL,
   `contact_id` int(11) NULL,
@@ -247,6 +248,17 @@ CREATE TABLE `error_log` (
   `modified_date` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
 UNIQUE KEY `id_UNIQUE` (`id`)
+);
+
+DROP TABLE IF EXISTS `idp_external_id`;
+
+CREATE TABLE `idp_external_id` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idp_id` int (11) NOT NULL,
+  `provider` VARCHAR(45) NOT NULL,
+  `external_id` VARCHAR(250) NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idp_external_UNIQUE` (`idp_id`, `provider`)
 );
 
 

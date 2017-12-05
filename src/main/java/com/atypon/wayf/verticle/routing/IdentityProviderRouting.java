@@ -19,9 +19,14 @@ package com.atypon.wayf.verticle.routing;
 import com.atypon.wayf.data.authentication.AuthenticatedEntity;
 import com.atypon.wayf.data.identity.IdentityProvider;
 import com.atypon.wayf.data.identity.IdentityProviderQuery;
+import com.atypon.wayf.data.identity.external.ExternalProvider;
+import com.atypon.wayf.data.identity.external.IdPExternalId;
+import com.atypon.wayf.data.identity.external.IdpExternalIdQuery;
 import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.facade.DeviceFacade;
 import com.atypon.wayf.facade.IdentityProviderFacade;
+import com.atypon.wayf.facade.IdpExternalIdFacade;
+import com.atypon.wayf.reactivex.FacadePolicies;
 import com.atypon.wayf.request.RequestContextAccessor;
 import com.atypon.wayf.request.RequestParamMapper;
 import com.atypon.wayf.request.RequestReader;
@@ -36,6 +41,10 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Singleton
 public class IdentityProviderRouting implements RoutingProvider {
@@ -53,6 +62,8 @@ public class IdentityProviderRouting implements RoutingProvider {
     private static final String ADD_IDP_TO_DEVICE = "/1/device/:localId/history/idp";
     private static final String REMOVE_IDP_FROM_DEVICE = "/1/device/:localId/history/idp/:idpId";
     private static final String REMOVE_IDP_FROM_MY_DEVICE = "/1/mydevice/history/idp/:idpId";
+    private static final String ADD_IDP_EXTERNAL_ID = "/1/identityProvider/external/:idpId";
+    private static final String READ_IDP_EXTERNAL_ID = "/1/identityProvider/external/:idpId";
 
     private static final String LOCAL_ID_ARG_DESCRIPTION = "Local ID";
     private static final String IDP_ID_ARG_DESCRIPTION = "Identity Provider ID";
@@ -61,6 +72,9 @@ public class IdentityProviderRouting implements RoutingProvider {
 
     @Inject
     private IdentityProviderFacade identityProviderFacade;
+
+    @Inject
+    private IdpExternalIdFacade externalIdFacade;
 
     @Inject
     private DeviceFacade deviceFacade;
@@ -74,11 +88,13 @@ public class IdentityProviderRouting implements RoutingProvider {
     public void addRoutings(Router router) {
         router.route("/1/identityProvider*").handler(BodyHandler.create());
         router.route("/1/device*").handler(BodyHandler.create());
-        router.get(READ_IDENTITY_PROVIDER).handler(handlerFactory.single((rc) -> readIdentityProvider(rc)));
-        router.get(FILTER_IDENTITY_PROVIDERS).handler(handlerFactory.observable((rc) -> filterIdentityProviders(rc)));
-        router.post(ADD_IDP_TO_DEVICE).handler(handlerFactory.single((rc) -> addIdentityProviderToDevice(rc)));
-        router.delete(REMOVE_IDP_FROM_DEVICE).handler(handlerFactory.completable((rc) -> removeIdentityProviderFromDevice(rc)));
-        router.delete(REMOVE_IDP_FROM_MY_DEVICE).handler(handlerFactory.completable((rc) -> removeIdentityProviderFromMyDevice(rc)));
+        router.get(READ_IDENTITY_PROVIDER).handler(handlerFactory.single(this::readIdentityProvider));
+        router.get(FILTER_IDENTITY_PROVIDERS).handler(handlerFactory.observable(this::filterIdentityProviders));
+        router.post(ADD_IDP_TO_DEVICE).handler(handlerFactory.single(this::addIdentityProviderToDevice));
+        router.post(ADD_IDP_EXTERNAL_ID).handler(handlerFactory.single(this::addExternalId));
+        router.get(READ_IDP_EXTERNAL_ID).handler(handlerFactory.observable(this::readExternalId));
+        router.delete(REMOVE_IDP_FROM_DEVICE).handler(handlerFactory.completable(this::removeIdentityProviderFromDevice));
+        router.delete(REMOVE_IDP_FROM_MY_DEVICE).handler(handlerFactory.completable(this::removeIdentityProviderFromMyDevice));
 
     }
 
@@ -133,5 +149,31 @@ public class IdentityProviderRouting implements RoutingProvider {
         Long idpId = Long.valueOf(RequestReader.readRequiredPathParameter(routingContext, IDP_ID_PARAM_NAME, IDP_ID_ARG_DESCRIPTION));
 
         return identityProviderFacade.blockIdentityProviderForGlobalId(globalId, idpId);
+    }
+
+    public Single<IdentityProvider> addExternalId(RoutingContext routingContext) {
+        LOG.debug("Received request to add externalId to IDP");
+
+        Long identityProviderId = Long.valueOf(RequestReader.readRequiredPathParameter(routingContext, IDP_ID_PARAM_NAME, IDP_ID_ARG_DESCRIPTION));
+
+        AuthenticatedEntity.authenticatedAsAdmin(RequestContextAccessor.get().getAuthenticated());
+
+        Single<IdentityProvider> identityProvider = identityProviderFacade.read(identityProviderId);
+        List<IdPExternalId> externalIds = RequestReader.readRequestBody(routingContext, IdentityProvider.class).blockingGet().getExternalIds();
+        return identityProviderFacade.resolveIdpExternalIds(identityProvider.blockingGet(), externalIds);
+    }
+
+    public Observable<IdPExternalId> readExternalId(RoutingContext routingContext) {
+        LOG.debug("Received read external IDs for IDP");
+
+        Long identityProviderId = Long.valueOf(RequestReader.readRequiredPathParameter(routingContext, IDP_ID_PARAM_NAME, IDP_ID_ARG_DESCRIPTION));
+        IdpExternalIdQuery query = new IdpExternalIdQuery().setIdpId(identityProviderId);
+        RequestParamMapper.mapParams(routingContext, query);
+        String provider = RequestReader.getQueryValue(routingContext, "provider");
+        if (provider != null) {
+            query.setProvider(ExternalProvider.valueOf(provider.toUpperCase()));
+        }
+
+        return externalIdFacade.filter(query);
     }
 }

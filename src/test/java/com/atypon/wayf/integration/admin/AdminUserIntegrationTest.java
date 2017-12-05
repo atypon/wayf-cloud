@@ -16,8 +16,8 @@
 
 package com.atypon.wayf.integration.admin;
 
+import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.verticle.routing.BaseHttpTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -43,7 +43,10 @@ public class AdminUserIntegrationTest extends BaseHttpTest {
     private static final String LOGIN_AFTER_RESET_REQUEST_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "credentials/login_after_reset_request.json");
 
     private static final String LIST_ADMIN_USER_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "user/list_admin_user_response.json");
-    private static final String LIST_ADMIN_USER_NO_CRENDTIALS_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "user/list_admin_user_no_credentials_response.json");
+    private static final String LIST_ADMIN_USER_NO_CREDENTIALS_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "user/list_admin_user_no_credentials_response.json");
+
+    private static final String FILTER_PUBLISHER_ADMIN_VIEW_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "publisher/filter_publishers_admin_view_response.json");
+    private static final String FILTER_PUBLISHER_NO_ADMIN_VIEW_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "publisher/filter_publishers_no_admin_view_response.json");
 
     private static final String CURRENT_USER_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "user/current_user_response.json");
     private static final String CURRENT_USER_INVALID_TOKEN_RESPONSE_JSON = getFileAsString(BASE_ADMIN_USER_FILE_PATH + "user/current_user_invalid_token_response.json");
@@ -118,6 +121,44 @@ public class AdminUserIntegrationTest extends BaseHttpTest {
     }
 
     @Test
+    public void testDeletePublisher(){
+        String credentialsEmail = UUID.randomUUID().toString() + "@atypon.com";
+        userTestUtil.testCreateUser(credentialsEmail, CREATE_ADMIN_REQUEST_JSON, CREATE_ADMIN_RESPONSE_JSON);
+
+        String adminToken = userTestUtil.testLogin(credentialsEmail, LOGIN_REQUEST_JSON);
+
+        Publisher publisher = publisherTestUtil.testCreatePublisher(adminToken, CREATE_PUBLISHER_REQUEST_JSON, CREATE_PUBLISHER_RESPONSE_JSON);
+
+        publisherTestUtil.testDeletePublisher(publisher.getId());
+        publisherTestUtil.readDeletedPublisher(publisher.getId(),"{}");
+    }
+
+    @Test
+    public void testDeletePublisherWithNoContact(){
+        String credentialsEmail = UUID.randomUUID().toString() + "@atypon.com";
+        userTestUtil.testCreateUser(credentialsEmail, CREATE_ADMIN_REQUEST_JSON, CREATE_ADMIN_RESPONSE_JSON);
+
+        String adminToken = userTestUtil.testLogin(credentialsEmail, LOGIN_REQUEST_JSON);
+
+        Publisher publisher = publisherTestUtil.testCreatePublisher(adminToken, CREATE_PUBLISHER_REQUEST_JSON, CREATE_PUBLISHER_RESPONSE_JSON);
+
+        userTestUtil.deleteUser(publisher.getContact().getId());
+        publisherTestUtil.testDeletePublisher(publisher.getId());
+    }
+
+    @Test
+    public void testDeletePublisherNoCredentials(){
+        String credentialsEmail = UUID.randomUUID().toString() + "@atypon.com";
+        userTestUtil.testCreateUser(credentialsEmail, CREATE_ADMIN_REQUEST_JSON, CREATE_ADMIN_RESPONSE_JSON);
+
+        String adminToken = userTestUtil.testLogin(credentialsEmail, LOGIN_REQUEST_JSON);
+
+        Publisher publisher = publisherTestUtil.testCreatePublisher(adminToken, CREATE_PUBLISHER_REQUEST_JSON, CREATE_PUBLISHER_RESPONSE_JSON);
+
+        publisherTestUtil.testDeletePublisherNoCredentials(publisher.getId(),DELETE_USER_NO_CREDENTIALS_RESPONSE_JSON);
+    }
+
+    @Test
     public void testDeleteUserNoCredentials() {
         String credentialsEmail = UUID.randomUUID().toString() + "@atypon.com";
         Long userId = userTestUtil.testCreateUser(credentialsEmail, CREATE_ADMIN_REQUEST_JSON, CREATE_ADMIN_RESPONSE_JSON);
@@ -169,7 +210,7 @@ public class AdminUserIntegrationTest extends BaseHttpTest {
     public void testListAdminUserNoCredentials() {
         String credentialsEmail = UUID.randomUUID().toString() + "@atypon.com";
         Long userId = userTestUtil.testCreateUser(credentialsEmail, CREATE_ADMIN_REQUEST_JSON, CREATE_ADMIN_RESPONSE_JSON);
-        userTestUtil.testListAdminUsersNoCredentials(userId, LIST_ADMIN_USER_NO_CRENDTIALS_RESPONSE_JSON);
+        userTestUtil.testListAdminUsersNoCredentials(userId, LIST_ADMIN_USER_NO_CREDENTIALS_RESPONSE_JSON);
     }
 
     @Test
@@ -191,4 +232,19 @@ public class AdminUserIntegrationTest extends BaseHttpTest {
 
         userTestUtil.testMeInvalidToken(adminToken1, CURRENT_USER_INVALID_TOKEN_RESPONSE_JSON);
     }
+
+    @Test
+    public void testFilterPublishers() {
+        String credentialsEmail = UUID.randomUUID().toString() + "@atypon.com";
+        Long userId = userTestUtil.testCreateUser(credentialsEmail, CREATE_ADMIN_REQUEST_JSON, CREATE_ADMIN_RESPONSE_JSON);
+
+        String adminToken = userTestUtil.testLogin(credentialsEmail, LOGIN_REQUEST_JSON);
+
+        Publisher publisher = publisherTestUtil.testCreatePublisher(adminToken, CREATE_PUBLISHER_REQUEST_JSON, CREATE_PUBLISHER_RESPONSE_JSON);
+
+        publisherTestUtil.testFilterPublisherAdmin(adminToken, publisher.getId(), FILTER_PUBLISHER_ADMIN_VIEW_RESPONSE_JSON);
+        publisherTestUtil.testFilterPublisher(publisher.getId(), FILTER_PUBLISHER_NO_ADMIN_VIEW_RESPONSE_JSON);
+        publisherTestUtil.testPublisherAdminNoCredentials(publisher.getId(), LIST_ADMIN_USER_NO_CREDENTIALS_RESPONSE_JSON);
+    }
+
 }
