@@ -97,10 +97,10 @@ public class DeviceRoutingProvider implements RoutingProvider {
         router.post(ADD_DEVICE_PUBLISHER_RELATIONSHIP).handler(handlerFactory.completable((rc) -> registerLocalId(rc)));
         router.patch(ADD_DEVICE_PUBLISHER_RELATIONSHIP).handler(handlerFactory.cookieSingle((rc) -> createPublisherDeviceRelationship(rc)));
         router.post(CREATE_GLOBAL_ID).handler(handlerFactory.cookieSingle(rc -> createGlobalId(rc)));
-        router.delete(DELETE_GLOBAL_ID).handler(handlerFactory.completable((rc)-> deleteDevice(rc)));
+        router.delete(DELETE_GLOBAL_ID).handler(handlerFactory.completable((rc) -> deleteDevice(rc)));
     }
 
-    public Completable deleteDevice(RoutingContext routingContext){
+    public Completable deleteDevice(RoutingContext routingContext) {
         Device device = readMyDevice(routingContext).blockingGet();
         return deviceFacade.deleteDevice(device.getId());
     }
@@ -129,8 +129,7 @@ public class DeviceRoutingProvider implements RoutingProvider {
         String deviceId = RequestReader.getCookieValue(routingContext, RequestReader.DEVICE_ID);
         query.setGlobalId(deviceId);
 
-        Observable<Device> device = deviceFacade.filter(query);
-        return device.isEmpty().blockingGet() ? createGlobalId(routingContext) : device.firstOrError();
+        return deviceFacade.read(query);
 
     }
 
