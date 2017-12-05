@@ -135,7 +135,8 @@ public class DeviceFacadeImpl implements DeviceFacade {
 
         LOG.debug("Found global ID from client [{}]", deviceGlobalId);
         if (deviceGlobalId != null) {
-            return read(new DeviceQuery().setGlobalId(deviceGlobalId));
+            Observable<Device> device = filter(new DeviceQuery().setGlobalId(deviceGlobalId));
+            return device.isEmpty().blockingGet() ? create(new Device()) : device.firstOrError();
         }
 
         // If the localId has already been used, return the device associated with it. Otherwise, create a new Device

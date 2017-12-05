@@ -130,7 +130,7 @@ public class DeviceRoutingProvider implements RoutingProvider {
         query.setGlobalId(deviceId);
 
         Observable<Device> device = deviceFacade.filter(query);
-        return device.isEmpty().blockingGet() ? createGlobalId(routingContext) : device.firstOrError();
+        return device.isEmpty().blockingGet() ? createGlobalId(routingContext) : device.singleOrError();
 
     }
 
