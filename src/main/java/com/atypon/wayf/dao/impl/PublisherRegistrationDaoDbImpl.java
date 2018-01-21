@@ -19,6 +19,7 @@ package com.atypon.wayf.dao.impl;
 import com.atypon.wayf.dao.PublisherRegistrationDao;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistration;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistrationQuery;
+import com.atypon.wayf.data.user.User;
 import com.atypon.wayf.database.DbExecutor;
 import com.atypon.wayf.reactivex.DaoPolicies;
 import com.google.inject.Inject;
@@ -29,10 +30,13 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class PublisherRegistrationDaoDbImpl implements PublisherRegistrationDao {
     private static final Logger LOG = LoggerFactory.getLogger(PublisherRegistrationDaoDbImpl.class);
+    private static final String CONTACT_ID = "contactId";
 
     @Inject
     @Named("publisher-registration.dao.db.create")
@@ -45,6 +49,10 @@ public class PublisherRegistrationDaoDbImpl implements PublisherRegistrationDao 
     @Inject
     @Named("publisher-registration.dao.db.update")
     private String updateSql;
+
+    @Inject
+    @Named("publisher-registration.dao.db.delete")
+    private String deleteSql;
 
     @Inject
     @Named("publisher-registration.dao.db.filter")
@@ -93,5 +101,14 @@ public class PublisherRegistrationDaoDbImpl implements PublisherRegistrationDao 
         return Observable.just(filter)
                 .compose((observable) -> DaoPolicies.applyObservable(observable))
                 .flatMap((_filter) -> dbExecutor.executeSelect(filterSql, _filter, PublisherRegistration.class));
+    }
+
+    @Override
+    public Single<Long> delete(Long contactID) {
+        PublisherRegistration publisherRegistration = new PublisherRegistration();
+        User user = new User();
+        user.setId(contactID);
+        publisherRegistration.setContact(user);
+        return dbExecutor.executeUpdate(deleteSql, publisherRegistration);
     }
 }

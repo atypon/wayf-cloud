@@ -60,6 +60,8 @@ public class DeviceRoutingProvider implements RoutingProvider {
     private static final String READ_MY_DEVICE = "/1/mydevice";
     private static final String FILTER_DEVICE = "/1/devices";
     private static final String ADD_DEVICE_PUBLISHER_RELATIONSHIP = "/1/device/:localId";
+    private static final String CREATE_GLOBAL_ID = "/1/device/";
+    private static final String DELETE_GLOBAL_ID = "/1/mydevice/";
 
     @Inject
     private ResponseWriter responseWriter;
@@ -94,6 +96,18 @@ public class DeviceRoutingProvider implements RoutingProvider {
         router.get(FILTER_DEVICE).handler(handlerFactory.observable((rc) -> filterDevice(rc)));
         router.post(ADD_DEVICE_PUBLISHER_RELATIONSHIP).handler(handlerFactory.completable((rc) -> registerLocalId(rc)));
         router.patch(ADD_DEVICE_PUBLISHER_RELATIONSHIP).handler(handlerFactory.cookieSingle((rc) -> createPublisherDeviceRelationship(rc)));
+        router.post(CREATE_GLOBAL_ID).handler(handlerFactory.cookieSingle(rc -> createGlobalId(rc)));
+        router.delete(DELETE_GLOBAL_ID).handler(handlerFactory.cookieSingle((rc) -> deleteDevice(rc)));
+    }
+
+    public Single deleteDevice(RoutingContext routingContext) {
+        return readMyDevice(routingContext).flatMap(device ->
+                deviceFacade.deleteDevice(device.getId()).andThen(invalidateGlobalIdCookie(routingContext)));
+    }
+
+    public Single<Device> createGlobalId(RoutingContext rc) {
+        LOG.debug("Received create Device request");
+        return deviceFacade.create(new Device()).map(device -> addGlobalIdCookie(device, rc));
     }
 
     public Single<Device> readDevice(RoutingContext routingContext) {
@@ -116,6 +130,7 @@ public class DeviceRoutingProvider implements RoutingProvider {
         query.setGlobalId(deviceId);
 
         return deviceFacade.read(query);
+
     }
 
     public Observable<Device> filterDevice(RoutingContext routingContext) {
@@ -166,31 +181,40 @@ public class DeviceRoutingProvider implements RoutingProvider {
                     String hashedLocalId = deviceFacade.encryptLocalId(publisher.getId(), localId);
 
                     return deviceFacade.relateLocalIdToDevice(publisher, hashedLocalId)
-                            .map((device) -> {
-                                String globalId = device.getGlobalId();
-
-                                Cookie cookie = new CookieImpl(RequestReader.DEVICE_ID, globalId)
-                                        .setDomain(wayfDomain)
-                                        .setMaxAge(158132000l)
-                                        .setPath("/");
-
-                                String requestOrigin = RequestReader.getHeaderValue(routingContext, "Origin");
-
-                                LOG.debug("Request origin [{}]", requestOrigin);
-
-                                if (requestOrigin == null || requestOrigin.isEmpty()) {
-                                    throw new ServiceException(HttpStatus.SC_BAD_REQUEST, "Origin header is required");
-                                }
-
-                                routingContext.response().putHeader("Access-Control-Allow-Origin", requestOrigin);
-
-                                routingContext.addCookie(cookie);
-                                device.setGlobalId(null);
-
-                                return device;
-                            });
+                            .map((device) -> addGlobalIdCookie(device, routingContext));
 
                 });
+    }
+
+    private Device addGlobalIdCookie(Device device, RoutingContext rc) {
+        String globalId = device.getGlobalId();
+
+        Cookie cookie = new CookieImpl(RequestReader.DEVICE_ID, globalId)
+                .setMaxAge(158132000l)
+                .setPath("/");
+
+        String requestOrigin = RequestReader.getHeaderValue(rc, "Origin");
+
+        LOG.debug("Request origin [{}]", requestOrigin);
+
+        if (requestOrigin != null && !requestOrigin.isEmpty()) {
+            rc.response().putHeader("Access-Control-Allow-Origin", requestOrigin);
+        }
+
+        rc.addCookie(cookie);
+        device.setGlobalId(null);
+
+        return device;
+    }
+
+    private Single invalidateGlobalIdCookie(RoutingContext routingContext) {
+        Cookie cookie = new CookieImpl(RequestReader.DEVICE_ID, "removed")
+                .setMaxAge(0)
+                .setPath("/");
+
+        routingContext.addCookie(cookie);
+
+        return Single.just(new Device());
     }
 
     private DeviceQuery buildQuery(RoutingContext routingContext) {
@@ -206,4 +230,5 @@ public class DeviceRoutingProvider implements RoutingProvider {
         return query;
 
     }
+
 }

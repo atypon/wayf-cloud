@@ -163,6 +163,7 @@ public class AuthenticatableRedisSerializer {
             credentials = deserializeEmailPassword(credentialsJsonObject);
         } else if (AUTHORIZATION_TOKEN_CREDENTIALS.equals(credentialsType)) {
             credentials = deserializeAuthorizationToken(credentialsJsonObject);
+            authenticatedEntity .setAuthenticatedUntil(((AuthorizationToken)credentials).getValidUntil());
         } else {
             throw new ServiceException(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Could not deserialize authenticatble");
         }

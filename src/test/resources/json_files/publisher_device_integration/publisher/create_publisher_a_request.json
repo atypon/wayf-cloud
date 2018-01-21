@@ -1,6 +1,7 @@
 {
   "code" : "PUBLISHER_A",
   "name" : "Publisher A",
+  "url" : "http://testUrl.test",
   "contact" : {
     "firstName" : "Test First Name",
     "lastName" : "Test Last Name",

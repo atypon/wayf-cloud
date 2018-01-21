@@ -64,6 +64,10 @@ public class DeviceAdminIntegrationTest extends BaseHttpTest {
     private static final String HISTORY_AFTER_DELETE_RESPONSE_JSON = getFileAsString(BASE_DEVICE_ADMIN_FILE_PATH + "/history/history_after_delete_response.json");
 
     private static final String MYDEVICE_RESPONSE_JSON = getFileAsString(BASE_DEVICE_ADMIN_FILE_PATH + "/device/mydevice_response.json");
+    private static final String CREATE_SAML_IDP_WITH_EXTERNAL_ID_REQUEST =  getFileAsString(BASE_DEVICE_ADMIN_FILE_PATH + "/identity_provider/external_id/saml_with_external_id_request.json");
+    private static final String CREATE_SAML_IDP_WITH_EXTERNAL_ID_RESPONSE =  getFileAsString(BASE_DEVICE_ADMIN_FILE_PATH + "/identity_provider/external_id/saml_with_external_id_response.json");
+    private static final String FILTER_EXTERNAL_ID_FOR_IDP_RESPONSE=  getFileAsString(BASE_DEVICE_ADMIN_FILE_PATH + "/identity_provider/external_id/filter_external_id_for_idp_response.json");
+    private static final String FILTER_EXTERNAL_ID_FOR_IDP_WITH_PROVIDER_NAME_RESPONSE=  getFileAsString(BASE_DEVICE_ADMIN_FILE_PATH + "/identity_provider/external_id/filter_external_id_for_idp_wiht_provider_name_response.json");
 
 
     private Publisher publisherA;
@@ -97,7 +101,12 @@ public class DeviceAdminIntegrationTest extends BaseHttpTest {
         globalId = deviceTestUtil.relateDeviceToPublisher(publisherALocalId, publisherA.getCode(), null, RELATE_NEW_DEVICE_PUBLISHER_A_RESPONSE_JSON);
 
         // Add the IDPs to the device multiple times and validate the IDP's ID is the same each time
-        Long samlId = identityProviderTestUtil.testAddIdpToDeviceAndIdpResolution(5, publisherALocalId, publisherA.getToken(), CREATE_SAML_IDP_REQUEST_JSON, CREATE_SAML_IDP_RESPONSE_JSON);
+        Long samlId = identityProviderTestUtil.testAddIdpToDeviceAndIdpResolution(5, publisherALocalId, publisherA.getToken(), CREATE_SAML_IDP_WITH_EXTERNAL_ID_REQUEST, CREATE_SAML_IDP_WITH_EXTERNAL_ID_RESPONSE);
+        identityProviderTestUtil.addIdpExternalId(samlId, CREATE_SAML_IDP_WITH_EXTERNAL_ID_REQUEST, CREATE_SAML_IDP_WITH_EXTERNAL_ID_RESPONSE);
+        identityProviderTestUtil.readIdpExternalIdByIdpId(samlId, FILTER_EXTERNAL_ID_FOR_IDP_RESPONSE);
+        String provider = "redlink";
+        identityProviderTestUtil.readIdpExternalIdByIdpIdAndExternalProvider(samlId, provider, FILTER_EXTERNAL_ID_FOR_IDP_WITH_PROVIDER_NAME_RESPONSE);
+
         Long openAthensId = identityProviderTestUtil.testAddIdpToDeviceAndIdpResolution(4, publisherALocalId, publisherA.getToken(), CREATE_OPEN_ATHENS_IDP_REQUEST_JSON, CREATE_OPEN_ATHENS_IDP_RESPONSE_JSON);
         Long oauthId = identityProviderTestUtil.testAddIdpToDeviceAndIdpResolution(3, publisherALocalId, publisherA.getToken(), CREATE_OAUTH_IDP_REQUEST_JSON, CREATE_OAUTH_IDP_RESPONSE_JSON);
 
@@ -114,9 +123,9 @@ public class DeviceAdminIntegrationTest extends BaseHttpTest {
         identityProviderTestUtil.removeIdpForDevice(publisherALocalId, publisherA.getToken(), samlId);
 
         // Add back the SAML identity to the device
-        identityProviderTestUtil.testAddIdpToDeviceAndIdpResolution(5, publisherBLocalId, publisherB.getToken(), CREATE_SAML_IDP_REQUEST_JSON, CREATE_SAML_IDP_RESPONSE_JSON);
-    }
+        identityProviderTestUtil.testAddIdpToDeviceAndIdpResolution(5, publisherBLocalId, publisherB.getToken(), CREATE_SAML_IDP_REQUEST_JSON, CREATE_SAML_IDP_WITH_EXTERNAL_ID_RESPONSE);
 
+    }
     @Test
     public void readMyDevice() {
         deviceTestUtil.readMyDevice(globalId, MYDEVICE_RESPONSE_JSON);

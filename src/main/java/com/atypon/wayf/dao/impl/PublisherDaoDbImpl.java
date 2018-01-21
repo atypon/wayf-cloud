@@ -31,14 +31,13 @@ import io.reactivex.Single;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Singleton
 public class PublisherDaoDbImpl implements PublisherDao {
     private static final Logger LOG = LoggerFactory.getLogger(PublisherDaoDbImpl.class);
+    private static final String PUBLISHER_ID = "publisherId";
 
     @Inject
     @Named("publisher.dao.db.create")
@@ -55,6 +54,10 @@ public class PublisherDaoDbImpl implements PublisherDao {
     @Inject
     @Named("publisher.dao.db.filter")
     private String filterSql;
+
+    @Inject
+    @Named("publisher.dao.db.delete")
+    private String deleteSql;
 
     @Inject
     private DbExecutor dbExecutor;
@@ -95,5 +98,13 @@ public class PublisherDaoDbImpl implements PublisherDao {
         return Observable.just(filter)
                 .compose((observable) -> DaoPolicies.applyObservable(observable))
                 .flatMap((_filter) -> dbExecutor.executeSelect(filterSql, _filter, Publisher.class));
+    }
+
+    @Override
+    public Completable delete(Long publisherId) {
+
+        Publisher publisher = new Publisher();
+        publisher.setId(publisherId);
+        return dbExecutor.executeUpdate(deleteSql, publisher).toCompletable();
     }
 }

@@ -1,5 +1,6 @@
 {
   "publisherName" : "A Test Publisher",
+  "url" : "http://testUrl.test",
   "status":"PENDING",
   "contact" : {
     "firstName" : "Test",

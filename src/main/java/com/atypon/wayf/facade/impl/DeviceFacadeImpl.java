@@ -25,9 +25,11 @@ import com.atypon.wayf.data.device.DeviceQuery;
 import com.atypon.wayf.data.device.DeviceStatus;
 import com.atypon.wayf.data.device.access.DeviceAccess;
 import com.atypon.wayf.data.device.access.DeviceAccessQuery;
+import com.atypon.wayf.data.device.access.DeviceAccessType;
 import com.atypon.wayf.data.identity.IdentityProviderUsage;
 import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.facade.*;
+import com.atypon.wayf.reactivex.FacadePolicies;
 import com.atypon.wayf.request.RequestContextAccessor;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -109,18 +111,18 @@ public class DeviceFacadeImpl implements DeviceFacade {
 
                 // Create a DeviceAccess object to store the resolved Device and Publisher. This may be
                 // a little clunky but the alternative would be to create a new type to wrap the two
-                .map((device) -> new DeviceAccess.Builder().device(device).publisher(publisher).build())
+                .map((device) -> new DeviceAccess.Builder().device(device).publisher(publisher).type(DeviceAccessType.CREATE_IDP).build())
 
                 .flatMap((deviceAccess) ->
                     // Now that all the required data is available, point the local ID at the device
-                    deviceDao.updateDevicePublisherLocalIdXref(deviceAccess.getDevice().getId(), deviceAccess.getPublisher().getId(), localId)
+                   deviceAccessFacade.create(deviceAccess).flatMap(deviceAccess1 -> deviceDao.updateDevicePublisherLocalIdXref(deviceAccess.getDevice().getId(), deviceAccess.getPublisher().getId(), localId)
                             .map((numAffectedRows) -> {
                                 if (numAffectedRows != 1) {
                                     throw new ServiceException(HttpStatus.SC_NOT_FOUND, "Could not find local ID");
                                 }
 
                                 return deviceAccess.getDevice();
-                            })
+                            }))
                 );
     }
 
@@ -188,5 +190,13 @@ public class DeviceFacadeImpl implements DeviceFacade {
     @Override
     public String encryptLocalId(Long publisherId, String localId) {
         return cryptFacade.encrypt(publisherFacade.getPublishersSalt(publisherId), localId);
+    }
+
+    @Override
+    public Completable deleteDevice(Long deviceId){
+        return deviceDao.delete(deviceId)
+                .compose((completable) -> FacadePolicies.applyCompletable(completable))
+                .andThen(deviceAccessFacade.delete(deviceId))
+                .compose((completable) -> FacadePolicies.applyCompletable(completable));
     }
 }

@@ -24,27 +24,25 @@ import com.atypon.wayf.data.device.DeviceQuery;
 import com.atypon.wayf.data.device.access.DeviceAccess;
 import com.atypon.wayf.data.device.access.DeviceAccessType;
 import com.atypon.wayf.data.identity.*;
+import com.atypon.wayf.data.identity.external.IdPExternalId;
+import com.atypon.wayf.data.identity.external.IdpExternalIdQuery;
 import com.atypon.wayf.data.publisher.Publisher;
-import com.atypon.wayf.facade.DeviceAccessFacade;
-import com.atypon.wayf.facade.DeviceFacade;
-import com.atypon.wayf.facade.DeviceIdentityProviderBlacklistFacade;
-import com.atypon.wayf.facade.IdentityProviderFacade;
+import com.atypon.wayf.facade.*;
 import com.atypon.wayf.request.RequestContextAccessor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.reactivex.Completable;
+
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import static com.atypon.wayf.reactivex.FacadePolicies.singleOrException;
 
@@ -61,6 +59,9 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
     @Inject
     private DeviceAccessFacade deviceAccessFacade;
+
+    @Inject
+    private IdpExternalIdFacade externalIdFacade;
 
     @Inject
     private DeviceIdentityProviderBlacklistFacade blacklistFacade;
@@ -80,12 +81,36 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
     }
 
     @Override
+    public Single<IdentityProvider> resolveIdpExternalIds(IdentityProvider identityProvider, List<IdPExternalId> externalIds) {
+        //update the external id's only if the identity provider doesn't have ones before
+        if ((identityProvider.getExternalIds() == null || identityProvider.getExternalIds().isEmpty()) && externalIds != null && !externalIds.isEmpty()) {
+            List<IdPExternalId> persistedExtIds = new LinkedList<>();
+            Observable.fromIterable(externalIds).
+                    subscribe((externalId) -> {
+                        externalId.setIdentityProvider(identityProvider);
+                        externalIdFacade.getOrCreateExternalId(externalId).doOnError(e -> LOG.error(e.getLocalizedMessage())).subscribe((Consumer<IdPExternalId>) persistedExtIds::add);
+                    });
+            persistedExtIds.sort(Comparator.comparing(IdPExternalId::getProvider));
+            identityProvider.setExternalIds(persistedExtIds.isEmpty() ? null : persistedExtIds);
+        }
+        return Single.just(identityProvider);
+    }
+
+    @Override
     public Single<IdentityProvider> read(Long id) {
         Collection<IdentityProviderDao> daos = daosByType.values();
 
         // Loop through the DAOs and try to read the ID from each. Return the first entry found
         return singleOrException(Observable.fromIterable(daos)
-                .flatMapMaybe((dao) -> dao.read(id)), HttpStatus.SC_BAD_REQUEST, "Invalid IdentityProvider ID");
+                .flatMapMaybe((dao) -> dao.read(id)), HttpStatus.SC_BAD_REQUEST, "Invalid IdentityProvider ID").
+                flatMap(identityProvider -> externalIdFacade.
+                        filter(new IdpExternalIdQuery().setIdpId(identityProvider.getId())).
+                        collectInto(new LinkedList<IdPExternalId>(), LinkedList::add).
+                        map(list -> {
+                            identityProvider.setExternalIds(list.isEmpty() ? null : list);
+                            return identityProvider;
+                        })
+                );
     }
 
     @Override
@@ -110,7 +135,7 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
 
         return singleOrException(
-                foundProviders.switchIfEmpty(create(identityProvider).toObservable()),
+                foundProviders.switchIfEmpty(create(identityProvider).flatMap(idp -> resolveIdpExternalIds(idp, identityProvider.getExternalIds())).toObservable()),
                 HttpStatus.SC_BAD_REQUEST,
                 "Could not determine a unique IdentityProvider from input");
     }
@@ -125,14 +150,13 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
                 deviceFacade.readByLocalId(localId),
 
                 // Once the device and IdentityProvider have create a DeviceAccess object to contain both items
-                (resolvedIdentityProvider, device) ->
-                        new DeviceAccess.Builder()
-                                .device(device)
-                                .publisher(AuthenticatedEntity.authenticatedAsPublisher(RequestContextAccessor.get().getAuthenticated()))
-                                .identityProvider(resolvedIdentityProvider)
-                                .type(DeviceAccessType.ADD_IDP)
-                                .build()
-            ).flatMap((deviceAccess) ->
+                (resolvedIdentityProvider, device) -> new DeviceAccess.Builder()
+                        .device(device)
+                        .publisher(AuthenticatedEntity.authenticatedAsPublisher(RequestContextAccessor.get().getAuthenticated()))
+                        .identityProvider(resolvedIdentityProvider)
+                        .type(DeviceAccessType.ADD_IDP)
+                        .build()
+        ).flatMap((deviceAccess) ->
                 // Run some tasks and return the IDP when they complete
                 Completable.mergeArray(
                         // Remove the IDP from the blacklist if it was on it
@@ -140,6 +164,7 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
                         // Log the device access
                         deviceAccessFacade.create(deviceAccess).toCompletable().subscribeOn(Schedulers.io())
+
                 ).toSingleDefault(deviceAccess.getIdentityProvider())
         );
     }
@@ -156,7 +181,7 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
     @Override
     public Completable blockIdentityProviderForDevice(Device device, Long idpId) {
-        final Publisher publisher = RequestContextAccessor.get().getAuthenticated() != null?
+        final Publisher publisher = RequestContextAccessor.get().getAuthenticated() != null ?
                 AuthenticatedEntity.authenticatedAsPublisher(RequestContextAccessor.get().getAuthenticated()) : null;
 
         return read(idpId)
@@ -168,30 +193,34 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
                                 .type(DeviceAccessType.REMOVE_IDP)
                                 .build()
 
-        ).flatMapCompletable((deviceAccess) ->
-                Completable.mergeArray(
-                        blacklistFacade.add(deviceAccess.getDevice(), deviceAccess.getIdentityProvider()).subscribeOn(Schedulers.io()),
-                        deviceAccessFacade.create(deviceAccess).toCompletable().subscribeOn(Schedulers.io())
-                )
-        );
+                ).flatMapCompletable((deviceAccess) ->
+                        Completable.mergeArray(
+                                blacklistFacade.add(deviceAccess.getDevice(), deviceAccess.getIdentityProvider()).subscribeOn(Schedulers.io()),
+                                deviceAccessFacade.create(deviceAccess).toCompletable().subscribeOn(Schedulers.io())
+                        )
+                );
     }
 
     @Override
     public Observable<IdentityProvider> filter(IdentityProviderQuery query) {
         // If a type is known, only query that DAO. If no type is known, concat the results of filtering all DAOs
+        Observable<IdentityProvider> result;
         if (query.getType() != null) {
-            return daosByType.get(query.getType()).filter(query);
+            result = daosByType.get(query.getType()).filter(query);
         } else {
             Collection<IdentityProviderDao> daos = daosByType.values();
 
-            return Observable.fromIterable(daos)
+            result = Observable.fromIterable(daos)
                     .flatMap((dao) -> dao.filter(query))
-                    .collectInto(new LinkedList<IdentityProvider>(), (idpList, idp) -> idpList.add(idp))
-                    .flatMapObservable(idpList -> {
-                        Collections.sort(idpList, (a, b) -> a.getCreatedDate().compareTo(b.getCreatedDate()));
-                        return Observable.fromIterable(idpList);
-                    });
+                    .collectInto(new LinkedList<IdentityProvider>(), LinkedList::add)
+                    .flatMapObservable(Observable::fromIterable);
         }
+        return result.flatMap(idp -> externalIdFacade.filter(new IdpExternalIdQuery().setIdpId(idp.getId())).
+                collectInto(new LinkedList<IdPExternalId>(), LinkedList::add).
+                map(list -> {
+                    idp.setExternalIds(list.isEmpty() ? null : list);
+                    return idp;
+                }).toObservable()).sorted(Comparator.comparing(IdentityProvider::getId));
     }
 
     private Observable<IdentityProvider> resolveOauth(OauthEntity oauthEntity) {
@@ -211,7 +240,7 @@ public class IdentityProviderFacadeImpl implements IdentityProviderFacade {
             throw new ServiceException(HttpStatus.SC_BAD_REQUEST, "In order to resolve an OpenAthens Entity, 'organizationId' is required");
         }
 
-        IdentityProviderQuery query  = new IdentityProviderQuery()
+        IdentityProviderQuery query = new IdentityProviderQuery()
                 .setType(IdentityProviderType.OPEN_ATHENS)
                 .setOrganizationId(openAthensEntity.getOrganizationId());
 

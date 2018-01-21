@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/Atypon-OpenSource/wayf-cloud.svg?branch=master)](https://travis-ci.org/Atypon-OpenSource/wayf-cloud)
-[![codecov](https://codecov.io/gh/Atypon-OpenSource/wayf-cloud/branch/master/graph/badge.svg)](https://codecov.io/gh/Atypon-OpenSource/wayf-cloud)
+[![Build Status](https://travis-ci.org/Atypon-OpenSource/wayf-cloud.svg?branch=development)](https://travis-ci.org/Atypon-OpenSource/wayf-cloud)
+[![codecov](https://codecov.io/gh/Atypon-OpenSource/wayf-cloud/branch/development/graph/badge.svg)](https://codecov.io/gh/Atypon-OpenSource/wayf-cloud)
 
 # WAYF Cloud
 ## Introduction

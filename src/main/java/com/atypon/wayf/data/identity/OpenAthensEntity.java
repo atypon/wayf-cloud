@@ -17,6 +17,16 @@
 package com.atypon.wayf.data.identity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonPropertyOrder({
+        "entityId",
+        "scope",
+        "organizationId",
+        "type",
+        "name",
+        "externalIds"
+})
 
 public class OpenAthensEntity extends IdentityProvider {
 

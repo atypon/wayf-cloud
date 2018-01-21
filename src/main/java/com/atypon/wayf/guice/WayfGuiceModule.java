@@ -36,11 +36,10 @@ import com.atypon.wayf.database.BeanFactory;
 import com.atypon.wayf.database.DbExecutor;
 import com.atypon.wayf.facade.*;
 import com.atypon.wayf.facade.impl.*;
+import com.atypon.wayf.mail.DefaultMailMessageSender;
+import com.atypon.wayf.mail.MailMessageSender;
 import com.google.common.cache.CacheBuilder;
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
+import com.google.inject.*;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -91,6 +90,7 @@ public class WayfGuiceModule extends AbstractModule {
             properties.load(classLoader.getResourceAsStream("dao/publisher-registration-dao-db.properties"));
             properties.load(classLoader.getResourceAsStream("dao/user-dao-db.properties"));
             properties.load(classLoader.getResourceAsStream("dao/password-credentials-dao-db.properties"));
+            properties.load(classLoader.getResourceAsStream("dao/external-id-dao-db.properties"));
 
             Names.bindProperties(binder(), properties);
 
@@ -125,6 +125,8 @@ public class WayfGuiceModule extends AbstractModule {
             bind(PublisherRegistrationFacade.class).to(PublisherRegistrationFacadeImpl.class);
 
             bind(IdentityProviderFacade.class).to(IdentityProviderFacadeImpl.class);
+            bind(IdpExternalIdFacade.class).to(IdpExternalIdFacadeImpl.class);
+            bind(IdPExternalIdDao.class).to(IdPExternalIdDaoImpl.class);
 
             bind(ErrorLoggerFacade.class).to(ErrorLoggerFacadeImpl.class);
             bind(ErrorLoggerDao.class).to(ErrorLoggerDaoDbImpl.class);
@@ -134,6 +136,9 @@ public class WayfGuiceModule extends AbstractModule {
             bind(DeviceIdentityProviderBlacklistDao.class).to(DeviceIdentityProviderBlacklistDaoDbImpl.class);
 
             bind(ClientJsFacade.class).to(ClientJsFacadeImpl.class);
+
+            bind(MailMessageSender.class).to(DefaultMailMessageSender.class);
+
         } catch (Exception e) {
             LOG.error("Error initializing Guice", e);
             throw new RuntimeException(e);

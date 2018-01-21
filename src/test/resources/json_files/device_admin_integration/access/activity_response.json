@@ -75,14 +75,12 @@
     "device":{
 
     },
-    "identityProvider":{
-
-    },
     "publisher":{
 
     },
-    "type":"ADD_IDP"
+    "type":"CREATE_IDP"
   },
+
   {
     "device":{
 
@@ -214,5 +212,26 @@
 
     },
     "type":"ADD_IDP"
+  },
+  {
+    "device":{
+
+    },
+    "identityProvider":{
+
+    },
+    "publisher":{
+
+    },
+    "type":"ADD_IDP"
+  },
+  {
+    "device": {
+
+    },
+    "publisher": {
+
+    },
+    "type": "CREATE_IDP"
   }
 ]

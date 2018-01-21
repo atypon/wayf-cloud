@@ -19,5 +19,6 @@ package com.atypon.wayf.data.device.access;
 public enum DeviceAccessType {
     REMOVE_IDP,
     READ_IDP_HISTORY,
-    ADD_IDP
+    ADD_IDP,
+    CREATE_IDP
 }

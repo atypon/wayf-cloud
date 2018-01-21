@@ -238,6 +238,7 @@ public class DeviceTestUtil {
                 "$.activity[*].publisher.code",
                 "$.activity[*].publisher.contact.id",
                 "$.activity[*].publisher.createdDate",
+                "$.activity[*].publisher.url",
                 "$.activity[*].identityProvider.id",
                 "$.activity[*].identityProvider.createdDate",
                 "$.activity[*].createdDate",
@@ -245,5 +246,69 @@ public class DeviceTestUtil {
         };
 
         assertJsonEquals(expectedResponseJson, deviceBody, relateResponseGeneratedFields);
+    }
+
+    public void createDevice(String expectedResponseJson, String origin) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("User-Agent", "Test-Agent");
+
+        if(origin != null){
+            headers.put("Origin", origin);
+        }
+
+
+        ExtractableResponse relateResponse = requestFactory
+                .request()
+                .headers(headers)
+                .url("/1/device/")
+                .method(Method.POST)
+                .execute()
+                .statusCode(200)
+                .extract();
+
+        String deviceIdHeader = relateResponse.cookie("deviceId");
+        assertNotNull(deviceIdHeader);
+
+        if(origin != null){
+            String accessControlHeader = relateResponse.header("Access-Control-Allow-Origin");
+            assertNotNull(accessControlHeader);
+        }
+
+        String deviceBody = relateResponse.response().body().asString();
+
+        String[] relateResponseGeneratedFields = {
+                "$.id",
+                "$.createdDate"
+        };
+        assertJsonEquals(expectedResponseJson, deviceBody, relateResponseGeneratedFields);
+
+    }
+
+    public void CreateAndDeleteDevice() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("User-Agent", "Test-Agent");
+
+        ExtractableResponse relateResponse = requestFactory
+                .request()
+                .headers(headers)
+                .url("/1/device/")
+                .method(Method.POST)
+                .execute()
+                .statusCode(200)
+                .extract();
+
+        String deviceIdHeader = relateResponse.cookie("deviceId");
+        assertNotNull(deviceIdHeader);
+
+        headers.clear();
+        headers.put("Cookie", "deviceId=" + deviceIdHeader);
+        requestFactory
+                .request()
+                .headers(headers)
+                .url("/1/mydevice/")
+                .method(Method.DELETE)
+                .execute()
+                .statusCode(200)
+                .extract().response();
     }
 }

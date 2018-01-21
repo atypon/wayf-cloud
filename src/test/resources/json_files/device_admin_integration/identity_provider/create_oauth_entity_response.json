@@ -1,5 +1,11 @@
 {
   "provider": "TWITTER",
   "type": "OAUTH",
-  "name" : "TWITTER"
+  "name" : "TWITTER",
+  "externalIds": [
+    {
+      "provider": "RINGGOLD",
+      "id": "test"
+    }
+  ]
 }

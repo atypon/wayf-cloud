@@ -71,6 +71,10 @@ public class DeviceDaoDbImpl implements DeviceDao {
     private String readByPublisherLocalIdSql;
 
     @Inject
+    @Named("device.dao.db.delete-publisher-local-id-xref")
+    private String deletePublisherLocalIdXrefSql;
+
+    @Inject
     private DbExecutor dbExecutor;
 
     public DeviceDaoDbImpl() {
@@ -95,12 +99,14 @@ public class DeviceDaoDbImpl implements DeviceDao {
     }
 
     @Override
-    public Completable delete(String id) {
-        Map<String, Object> args = new HashMap<>();
-        args.put("id", id);
+    public Completable delete(Long id) {
+        Device device = new Device();
+        device.setId(id);
+        return dbExecutor.executeUpdate(deleteSql, device)
+                .toCompletable()
+                .andThen(dbExecutor.executeUpdate(deletePublisherLocalIdXrefSql, device))
+                .toCompletable();
 
-        return Completable.fromSingle(dbExecutor.executeUpdate(deleteSql, args))
-                .compose((completable) -> DaoPolicies.applyCompletable(completable));
     }
 
     @Override

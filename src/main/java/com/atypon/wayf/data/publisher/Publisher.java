@@ -35,6 +35,8 @@ public class Publisher implements Authenticatable {
     private String salt;
     private String widgetLocation;
 
+    private String url;
+
     private String code;
     private String name;
 
@@ -139,5 +141,13 @@ public class Publisher implements Authenticatable {
 
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

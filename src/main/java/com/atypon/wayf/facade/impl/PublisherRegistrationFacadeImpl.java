@@ -22,10 +22,13 @@ import com.atypon.wayf.data.authentication.AuthenticatedEntity;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistration;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistrationQuery;
 import com.atypon.wayf.data.publisher.registration.PublisherRegistrationStatus;
-import com.atypon.wayf.data.user.User;
 import com.atypon.wayf.data.user.UserQuery;
+import com.atypon.wayf.facade.PasswordCredentialsFacade;
 import com.atypon.wayf.facade.PublisherRegistrationFacade;
 import com.atypon.wayf.facade.UserFacade;
+import com.atypon.wayf.mail.Mail;
+import com.atypon.wayf.mail.MailMessageSender;
+import com.atypon.wayf.mail.notification.RegistrationNotificationBuilder;
 import com.atypon.wayf.reactivex.FacadePolicies;
 import com.atypon.wayf.request.RequestContextAccessor;
 import com.google.common.collect.Lists;
@@ -38,22 +41,22 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.mail.MessagingException;
+import java.util.*;
 
 @Singleton
 public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFacade {
     private static final Logger LOG = LoggerFactory.getLogger(PublisherRegistrationFacadeImpl.class);
-
+    private static final InflationPolicy CREATE_RESPONSE_INFLATION = new InflationPolicy().addChildPolicy(PublisherRegistrationQuery.CONTACT_FIELD, null);
     @Inject
     private UserFacade userFacade;
-
     @Inject
     private PublisherRegistrationDao publisherRegistrationDao;
+    @Inject
+    private PasswordCredentialsFacade credentialsFacade;
 
-    private static final InflationPolicy CREATE_RESPONSE_INFLATION = new InflationPolicy().addChildPolicy(PublisherRegistrationQuery.CONTACT_FIELD, null);
+    @Inject
+    private MailMessageSender mailSender;
 
     public PublisherRegistrationFacadeImpl() {
     }
@@ -70,13 +73,30 @@ public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFac
 
         return userFacade.create(publisherRegistration.getContact())
                 .map((contactUser) -> {
-                        publisherRegistration.setContact(contactUser);
-                        return publisherRegistration;
+                    publisherRegistration.setContact(contactUser);
+                    return publisherRegistration;
                 })
-                .compose((single) -> FacadePolicies.applySingle(single))
+                .compose(FacadePolicies::applySingle)
                 .flatMap((_publisherRegistration) -> publisherRegistrationDao.create(_publisherRegistration))
+                .flatMap(this::sendNotification)
                 .flatMap((_publisherRegistration) -> populate(query, Lists.newArrayList(_publisherRegistration)).toSingle(() -> _publisherRegistration));
 
+    }
+
+
+    private Single<PublisherRegistration> sendNotification(PublisherRegistration publisherRegistration) {
+
+        try {
+            Mail mail = new RegistrationNotificationBuilder(mailSender)
+                    .addRecipients(getAdminEmails())
+                    .addPublisherRegistration(publisherRegistration)
+                    .build();
+            mail.send();
+        } catch (MessagingException e) {
+            LOG.error(e.getMessage(), e);
+        }
+
+        return Single.just(publisherRegistration);
     }
 
     @Override
@@ -86,9 +106,9 @@ public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFac
         LOG.debug("Reading publisher registration with query [{}]", query);
 
         return FacadePolicies.singleOrException(
-                        publisherRegistrationDao.read(query.getId()).compose((maybe) -> FacadePolicies.applyMaybe(maybe)),
-                        HttpStatus.SC_NOT_FOUND,
-                        "Could not read PublisherRegistration with id {}", query.getId())
+                publisherRegistrationDao.read(query.getId()).compose((maybe) -> FacadePolicies.applyMaybe(maybe)),
+                HttpStatus.SC_NOT_FOUND,
+                "Could not read PublisherRegistration with id {}", query.getId())
                 .flatMap((publisherRegistration) -> populate(query, Lists.newArrayList(publisherRegistration)).toSingle(() -> publisherRegistration));
     }
 
@@ -135,5 +155,19 @@ public class PublisherRegistrationFacadeImpl implements PublisherRegistrationFac
                                 .cast(PublisherRegistration.class)
                                 .concatWith(Observable.fromIterable(registrationList))
                 );
+    }
+
+    public Completable delete(Long contactID) {
+        if (contactID == null) {
+            return Completable.complete();
+        }
+        return publisherRegistrationDao.delete(contactID).toCompletable();
+
+    }
+
+    private List<String> getAdminEmails() {
+        return credentialsFacade.getAllAdminEmails()
+                .collectInto(new ArrayList<String>(), (list, credential) -> list.add(credential.getEmailAddress()))
+                .blockingGet();
     }
 }

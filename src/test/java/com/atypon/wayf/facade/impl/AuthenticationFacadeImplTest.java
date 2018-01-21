@@ -54,47 +54,4 @@ public class AuthenticationFacadeImplTest {
         RequestContextAccessor.set(new RequestContext());
     }
 
-    @Ignore
-    @Test
-    public void testAllCacheLayers() {
-        /*Publisher testPublisher = new Publisher();
-        testPublisher.setId(1122L);
-
-        String tokenValue = UUID.randomUUID().toString();
-
-        AuthorizationToken authorizationToken = new AuthorizationToken();
-        authorizationToken.setType(AuthorizationTokenType.API_TOKEN);
-        authorizationToken.setValue(tokenValue);
-
-        authorizationToken.setAuthenticatable(testPublisher);
-        persistence.
-
-
-        // Test Read
-        AuthenticatedEntity authenticated = facade.authenticate(token);
-        assertNotNull(authenticated);
-        assertEquals(Publisher.class, authenticated.getAuthenticatable().getClass());
-        assertEquals(testPublisher.getId(), authenticated.getAuthenticatable().getId());
-
-        CacheLoader l1CacheLoader =  ((LoadingCache) facade.getL1Cache()).getCacheLoader();
-        ((LoadingCache) facade.getL1Cache()).setCacheLoader((key) -> Maybe.empty());
-        // Remove the L2 Cache and see if we can read from L1
-
-        AuthenticatedEntity authenticatedFromL1 = facade.authenticate(token);
-        assertNotNull(authenticatedFromL1);
-        assertEquals(Publisher.class, authenticatedFromL1.getAuthenticatable().getClass());
-        assertEquals(testPublisher.getId(), authenticatedFromL1.getAuthenticatable().getId());
-
-        // Reset the L2 Cache
-        ((LoadingCache) facade.getL1Cache()).setCacheLoader(l1CacheLoader);
-
-        // Clear L1 and Remove L3 to verify we can read from l2
-        facade.getL1Cache().invalidateAll();
-        facade.getRedisCache().setCacheLoader((key) -> Maybe.empty());
-
-        AuthenticatedEntity authenticatedFromL2 = facade.authenticate(token);
-        assertNotNull(authenticatedFromL2);
-        assertEquals(Publisher.class, authenticatedFromL2.getAuthenticatable().getClass());
-        assertEquals(testPublisher.getId(), authenticatedFromL2.getAuthenticatable().getId());*/
-    }
 }

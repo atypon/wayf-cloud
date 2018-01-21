@@ -114,6 +114,7 @@ public class PublisherRegistrationTestUtil {
                 "$.applicationDate",
                 "$.approvalDate",
                 "$.modifiedDate",
+                "$.url",
                 "$.createdDate"
         };
 
@@ -122,6 +123,7 @@ public class PublisherRegistrationTestUtil {
                 "$.contact.id",
                 "$.applicationDate",
                 "$.modifiedDate",
+                "$.url",
                 "$.createdDate"
         };
 

@@ -1,18 +1,34 @@
 [
   {
-    "name":"SAML Entity 2",
-    "entityId":"sample-saml-entity-id-2",
-    "federationId":"sample-saml-federation-id-2"
+    "entityId": "sample-saml-entity-id-2",
+    "federationId": "sample-saml-federation-id-2",
+    "name": "SAML Entity 2",
+    "externalIds": [
+      {
+        "id": "test2",
+        "provider": "ISNI"
+      },
+      {
+        "id": "test",
+        "provider": "REDLINK"
+      }
+    ]
   },
   {
-    "name":"Open Athens Entity 2",
-    "entityId":"sample-open-athens-2-entity-id",
-    "scope":"sample-scope-2",
-    "organizationId":"1234567"
+    "entityId": "sample-open-athens-2-entity-id",
+    "scope": "sample-scope-2",
+    "organizationId": "1234567",
+    "name": "Open Athens Entity 2"
   },
   {
-    "name":"TWITTER",
-    "provider":"TWITTER",
-    "type":"OAUTH"
+    "provider": "TWITTER",
+    "type": "OAUTH",
+    "name": "TWITTER",
+    "externalIds": [
+      {
+        "id": "test",
+        "provider": "RINGGOLD"
+      }
+    ]
   }
 ]

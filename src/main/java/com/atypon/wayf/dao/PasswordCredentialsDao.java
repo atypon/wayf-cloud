@@ -18,8 +18,10 @@ package com.atypon.wayf.dao;
 
 import com.atypon.wayf.data.authentication.PasswordCredentials;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 
 public interface PasswordCredentialsDao extends AuthenticationCredentialsDao<PasswordCredentials> {
 
     Maybe<String> getSaltForEmail(String email);
+    Observable<PasswordCredentials> getAllEmails();
 }

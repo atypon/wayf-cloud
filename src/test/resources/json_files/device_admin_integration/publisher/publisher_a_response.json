@@ -2,5 +2,6 @@
   "code" : "PUBLISHER_A",
   "name" : "Publisher A",
   "status" : "ACTIVE",
+  "url" : "http://testUrl.test",
   "contact":{}
 }

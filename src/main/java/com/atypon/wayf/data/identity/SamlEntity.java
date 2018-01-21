@@ -17,7 +17,15 @@
 package com.atypon.wayf.data.identity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({
+        "entityId",
+        "federationId",
+        "type",
+        "name",
+        "externalIds"
+})
 public class SamlEntity extends IdentityProvider {
 
     private String entityId;
@@ -49,3 +57,4 @@ public class SamlEntity extends IdentityProvider {
         this.federationId = federationId;
     }
 }
+

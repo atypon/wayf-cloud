@@ -18,15 +18,13 @@ package com.atypon.wayf.verticle.routing;
 
 import com.atypon.wayf.data.publisher.Publisher;
 import com.atypon.wayf.data.publisher.PublisherQuery;
-import com.atypon.wayf.facade.AuthenticationFacade;
 import com.atypon.wayf.facade.PublisherFacade;
 import com.atypon.wayf.request.RequestParamMapper;
 import com.atypon.wayf.request.RequestReader;
 import com.atypon.wayf.verticle.WayfRequestHandlerFactory;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vertx.ext.web.Router;
@@ -45,9 +43,9 @@ public class PublisherRouting implements RoutingProvider {
     private static final String PUBLISHER_ID_PARAM = ":" + PUBLISHER_ID_PARAM_NAME;
 
     private static final String CREATE_PUBLISHER = PUBLISHER_BASE_URL;
-    private static final String READ_PUBLISHER = PUBLISHER_BASE_URL + "/" +  PUBLISHER_ID_PARAM;
+    private static final String READ_PUBLISHER = PUBLISHER_BASE_URL + "/" + PUBLISHER_ID_PARAM;
     private static final String FILTER_PUBLISHERS = PUBLISHER_BASE_URL + "s";
-
+    private static final String DELETE_PUBLISHER = PUBLISHER_BASE_URL + "/" + PUBLISHER_ID_PARAM;
     private static final String PUBLISHER_ID_ARG_DESCRIPTION = "Publisher ID";
 
     @Inject
@@ -64,6 +62,8 @@ public class PublisherRouting implements RoutingProvider {
         router.post(CREATE_PUBLISHER).handler(handlerFactory.single((rc) -> createPublisher(rc)));
         router.get(READ_PUBLISHER).handler(handlerFactory.single((rc) -> readPublisher(rc)));
         router.get(FILTER_PUBLISHERS).handler(handlerFactory.observable((rc) -> filterPublishers(rc)));
+        router.delete(DELETE_PUBLISHER).handler(handlerFactory.completable((rc) -> removePublisher(rc)));
+
     }
 
     public Single<Publisher> createPublisher(RoutingContext routingContext) {
@@ -89,5 +89,14 @@ public class PublisherRouting implements RoutingProvider {
         RequestParamMapper.mapParams(routingContext, publisherQuery);
 
         return publisherFacade.filter(publisherQuery);
+    }
+
+
+    public Completable removePublisher(RoutingContext routingContext) {
+        LOG.debug("Received Delete PublisherSession request");
+
+        Long publisherId = Long.valueOf(RequestReader.readRequiredPathParameter(routingContext, PUBLISHER_ID_PARAM_NAME, PUBLISHER_ID_ARG_DESCRIPTION));
+
+        return publisherFacade.delete(publisherId);
     }
 }

@@ -32,6 +32,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.apache.http.HttpStatus;
 
@@ -127,5 +128,9 @@ public class PasswordCredentialsFacadeImpl implements PasswordCredentialsFacade 
         credentials.setAuthenticatable(user);
 
         return authenticationFacade.createCredentials(credentials);
+    }
+
+    public Observable<PasswordCredentials> getAllAdminEmails(){
+        return credentialsDao.getAllEmails();
     }
 }

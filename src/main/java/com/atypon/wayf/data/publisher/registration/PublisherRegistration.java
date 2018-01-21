@@ -26,6 +26,7 @@ public class PublisherRegistration {
     private PublisherRegistrationStatus status;
 
     private String publisherName;
+    private String url;
     private User contact;
 
     private Date applicationDate;
@@ -99,5 +100,13 @@ public class PublisherRegistration {
 
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

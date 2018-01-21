@@ -28,6 +28,8 @@ import io.reactivex.Observable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 @Singleton
 public class PasswordCredentialsDaoDbImpl implements PasswordCredentialsDao {
     private static final Logger LOG = LoggerFactory.getLogger(PasswordCredentialsDaoDbImpl.class);
@@ -54,7 +56,12 @@ public class PasswordCredentialsDaoDbImpl implements PasswordCredentialsDao {
     private String deleteSql;
 
     @Inject
+    @Named("password-credentials.dao.db.all-emails")
+    private String allEmailsSql;
+
+    @Inject
     private DbExecutor dbExecutor;
+
 
     @Override
     public Completable create(PasswordCredentials credentials) {
@@ -93,5 +100,10 @@ public class PasswordCredentialsDaoDbImpl implements PasswordCredentialsDao {
         LOG.debug("Deleting credentials for [{}-{}]", credentials.getEmailAddress());
 
         return dbExecutor.executeUpdate(deleteSql, credentials).toCompletable();
+    }
+
+    public Observable<PasswordCredentials> getAllEmails() {
+        LOG.debug("Selecting all admin emails");
+        return dbExecutor.executeSelect(allEmailsSql, new HashMap<>(), PasswordCredentials.class);
     }
 }

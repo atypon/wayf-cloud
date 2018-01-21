@@ -44,9 +44,9 @@ public class IdentityProviderDaoDbImpl implements IdentityProviderDao {
     @Override
     public Single<IdentityProvider> create(IdentityProvider identityProvider) {
         return Single.just(identityProvider)
-                .compose((single) -> DaoPolicies.applySingle(single))
+                .compose(DaoPolicies::applySingle)
                 .flatMap((_identityProvider) -> dbExecutor.executeUpdate(createSql, _identityProvider))
-                .flatMapMaybe((genId) -> read(Long.valueOf(genId)))
+                .flatMapMaybe(this::read)
                 .toSingle();
     }
 
@@ -55,14 +55,14 @@ public class IdentityProviderDaoDbImpl implements IdentityProviderDao {
         IdentityProviderQuery query = new IdentityProviderQuery().setId(id);
 
         return Single.just(query)
-                .compose((single) -> DaoPolicies.applySingle(single))
+                .compose(DaoPolicies::applySingle)
                 .flatMapMaybe((_query) -> dbExecutor.executeSelectFirst(readSql, _query, resultClass));
     }
 
     @Override
     public Observable<IdentityProvider> filter(IdentityProviderQuery query) {
         return Single.just(query)
-                .compose((single) -> DaoPolicies.applySingle(single))
+                .compose(DaoPolicies::applySingle)
                 .flatMapObservable((_query) -> dbExecutor.executeSelect(filterSql, query, resultClass));
     }
 }

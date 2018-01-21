@@ -20,13 +20,17 @@ import com.atypon.wayf.data.authentication.AuthorizationToken;
 import com.atypon.wayf.data.authentication.PasswordCredentials;
 import com.atypon.wayf.data.user.User;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PasswordCredentialsFacade {
     Single<String> getSaltForEmail(String email);
 
     Completable resetPassword(Long userId, PasswordCredentials credentials);
+
     Single<AuthorizationToken> generateSessionToken(PasswordCredentials credentials);
 
     Single<PasswordCredentials> generateEmailCredentials(User user);
+
+    Observable<PasswordCredentials> getAllAdminEmails();
 }

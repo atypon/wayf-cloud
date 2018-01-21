@@ -23,9 +23,14 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface PublisherRegistrationDao {
+
     Single<PublisherRegistration> create(PublisherRegistration publisherRegistration);
+
     Maybe<PublisherRegistration> read(Long id);
+
     Single<PublisherRegistration> update(PublisherRegistration publisherRegistration);
+
+    Single<Long> delete(Long contactID);
 
     Observable<PublisherRegistration> filter(PublisherRegistrationQuery query);
 }

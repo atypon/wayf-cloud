@@ -21,8 +21,11 @@ import java.util.List;
 import java.util.Set;
 
 public class PublisherQuery {
+    public static final String ADMIN_VIEW = "ADMIN";
+
     private Long[] ids;
     private String[] codes;
+    private String view;
 
     public PublisherQuery() {
     }
@@ -63,5 +66,13 @@ public class PublisherQuery {
 
     public boolean isNullCodes() {
         return codes == null;
+    }
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
     }
 }

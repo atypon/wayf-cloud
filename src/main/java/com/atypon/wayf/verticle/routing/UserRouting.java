@@ -82,13 +82,13 @@ public class UserRouting implements RoutingProvider {
 
     public void addRoutings(Router router) {
         router.route(USER_BASE_URL + "*").handler(BodyHandler.create());
-        router.post(USER_BASE_URL).handler(handlerFactory.single((rc) -> createUser(rc)));
-        router.get(READ_USER).handler(handlerFactory.single((rc) -> readUser(rc)));
-        router.get(FILTER_USERS).handler(handlerFactory.observable((rc) -> filterUsers(rc)));
-        router.post(LOGIN_URL).handler(handlerFactory.single((rc) -> login(rc)));
-        router.get(ME_URL).handler(handlerFactory.single((rc) -> getCurrentUser(rc)));
-        router.delete(DELETE_USER).handler(handlerFactory.completable((rc) -> deleteUser(rc)));
-        router.put(CHANGE_PASSWORD_URL).handler(handlerFactory.completable((rc) -> resetPassword(rc)));
+        router.post(USER_BASE_URL).handler(handlerFactory.single(this::createUser));
+        router.get(READ_USER).handler(handlerFactory.single(this::readUser));
+        router.get(FILTER_USERS).handler(handlerFactory.observable(this::filterUsers));
+        router.post(LOGIN_URL).handler(handlerFactory.single(this::login));
+        router.get(ME_URL).handler(handlerFactory.single(this::getCurrentUser));
+        router.delete(DELETE_USER).handler(handlerFactory.completable(this::deleteUser));
+        router.put(CHANGE_PASSWORD_URL).handler(handlerFactory.completable(this::resetPassword));
     }
 
     public Single<User> createUser(RoutingContext routingContext) {

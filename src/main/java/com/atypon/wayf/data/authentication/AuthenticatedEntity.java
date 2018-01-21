@@ -55,7 +55,7 @@ public class AuthenticatedEntity {
     public static Publisher authenticatedAsPublisher(AuthenticatedEntity authenticatable) {
         if (authenticatable != null
                 && authenticatable.getAuthenticatable() != null
-                && Publisher.class.isAssignableFrom(authenticatable.getAuthenticatable().getClass())) {
+                && Publisher.class.isAssignableFrom(authenticatable.getAuthenticatable().getClass()) && stillValid(authenticatable.getAuthenticatedUntil())) {
             return (Publisher) authenticatable.getAuthenticatable();
         }
 
@@ -65,10 +65,14 @@ public class AuthenticatedEntity {
     public static User authenticatedAsAdmin(AuthenticatedEntity authenticatable) {
         if (authenticatable != null
                 && authenticatable.getAuthenticatable() != null
-                && User.class.isAssignableFrom(authenticatable.getAuthenticatable().getClass())) {
+                && User.class.isAssignableFrom(authenticatable.getAuthenticatable().getClass()) && stillValid(authenticatable.getAuthenticatedUntil())) {
             return (User) authenticatable.getAuthenticatable();
         }
 
         throw new ServiceException(HttpStatus.SC_UNAUTHORIZED, "An authenticated Administrator is required");
+    }
+
+    private static boolean stillValid(Date validUntil) {
+        return validUntil == null || validUntil.compareTo(new Date()) > 0;
     }
 }
