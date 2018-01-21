@@ -252,279 +252,12 @@
           "userAgent":"Test-Agent"
         }
       },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
+      "publisher": {
+        "status": "ACTIVE",
+        "name": "Publisher B",
+        "contact": {}
       },
-      "type":"READ_IDP_HISTORY"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OAUTH",
-        "name":"Google",
-        "provider":"GOOGLE"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OAUTH",
-        "name":"Google",
-        "provider":"GOOGLE"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OAUTH",
-        "name":"Google",
-        "provider":"GOOGLE"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OPEN_ATHENS",
-        "name":"Open Athens Entity",
-        "entityId":"sample-open-athens-entity-id",
-        "scope":"sample-scope",
-        "organizationId":"123456"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OPEN_ATHENS",
-        "name":"Open Athens Entity",
-        "entityId":"sample-open-athens-entity-id",
-        "scope":"sample-scope",
-        "organizationId":"123456"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OPEN_ATHENS",
-        "name":"Open Athens Entity",
-        "entityId":"sample-open-athens-entity-id",
-        "scope":"sample-scope",
-        "organizationId":"123456"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"OPEN_ATHENS",
-        "name":"Open Athens Entity",
-        "entityId":"sample-open-athens-entity-id",
-        "scope":"sample-scope",
-        "organizationId":"123456"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"SAML",
-        "name":"SAML Entity",
-        "entityId":"sample-saml-entity-id",
-        "federationId":"sample-saml-federation-id"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"SAML",
-        "name":"SAML Entity",
-        "entityId":"sample-saml-entity-id",
-        "federationId":"sample-saml-federation-id"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"SAML",
-        "name":"SAML Entity",
-        "entityId":"sample-saml-entity-id",
-        "federationId":"sample-saml-federation-id"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"SAML",
-        "name":"SAML Entity",
-        "entityId":"sample-saml-entity-id",
-        "federationId":"sample-saml-federation-id"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
-    },
-    {
-      "device":{
-        "status":"ACTIVE",
-        "info":{
-          "userAgent":"Test-Agent"
-        }
-      },
-      "identityProvider":{
-        "type":"SAML",
-        "name":"SAML Entity",
-        "entityId":"sample-saml-entity-id",
-        "federationId":"sample-saml-federation-id"
-      },
-      "publisher":{
-        "status":"ACTIVE",
-        "name":"Publisher A",
-        "contact":{
-
-        }
-      },
-      "type":"ADD_IDP"
+      "type": "CREATE_IDP"
     },
     {
       "device":{
@@ -541,6 +274,301 @@
         }
       },
       "type":"READ_IDP_HISTORY"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OAUTH",
+        "name":"Google",
+        "provider":"GOOGLE"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OAUTH",
+        "name":"Google",
+        "provider":"GOOGLE"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OAUTH",
+        "name":"Google",
+        "provider":"GOOGLE"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OPEN_ATHENS",
+        "name":"Open Athens Entity",
+        "entityId":"sample-open-athens-entity-id",
+        "scope":"sample-scope",
+        "organizationId":"123456"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OPEN_ATHENS",
+        "name":"Open Athens Entity",
+        "entityId":"sample-open-athens-entity-id",
+        "scope":"sample-scope",
+        "organizationId":"123456"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OPEN_ATHENS",
+        "name":"Open Athens Entity",
+        "entityId":"sample-open-athens-entity-id",
+        "scope":"sample-scope",
+        "organizationId":"123456"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"OPEN_ATHENS",
+        "name":"Open Athens Entity",
+        "entityId":"sample-open-athens-entity-id",
+        "scope":"sample-scope",
+        "organizationId":"123456"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"SAML",
+        "name":"SAML Entity",
+        "entityId":"sample-saml-entity-id",
+        "federationId":"sample-saml-federation-id"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"SAML",
+        "name":"SAML Entity",
+        "entityId":"sample-saml-entity-id",
+        "federationId":"sample-saml-federation-id"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"SAML",
+        "name":"SAML Entity",
+        "entityId":"sample-saml-entity-id",
+        "federationId":"sample-saml-federation-id"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"SAML",
+        "name":"SAML Entity",
+        "entityId":"sample-saml-entity-id",
+        "federationId":"sample-saml-federation-id"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "identityProvider":{
+        "type":"SAML",
+        "name":"SAML Entity",
+        "entityId":"sample-saml-entity-id",
+        "federationId":"sample-saml-federation-id"
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"ADD_IDP"
+    },
+    {
+      "device":{
+        "status":"ACTIVE",
+        "info":{
+          "userAgent":"Test-Agent"
+        }
+      },
+      "publisher":{
+        "status":"ACTIVE",
+        "name":"Publisher A",
+        "contact":{
+
+        }
+      },
+      "type":"READ_IDP_HISTORY"
+    },
+    {
+      "device": {
+        "status": "ACTIVE",
+        "info": {
+          "userAgent": "Test-Agent"
+        }
+      },
+      "publisher": {
+        "status": "ACTIVE",
+        "name": "Publisher A",
+        "contact": {}
+      },
+      "type": "CREATE_IDP"
     }
   ]
 }
